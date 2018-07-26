@@ -11,13 +11,15 @@ Kirby 3 Plugin for easier Security Headers setup.
 ## Usage
 
 ```php
-
+<?php
+  echo snippet('plugin-securityheaders');
+?><!DOCTYPE html>
+<!-- ... -->
 ```
 
 ## Settings
 
-**hash**
-default: will lead to query string and does not require htaccess setup. thanks @fabianmichael. [#1](https://github.com/bnomei/kirby3-securityheaders/issues/1)
+TODO
 
 
 
