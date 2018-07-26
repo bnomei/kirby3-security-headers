@@ -1,0 +1,32 @@
+{
+    "name": "bnomei/kirby3-security-headers",
+    "type": "plugin",
+    "version": "0.5.0",
+    "license": "MIT",
+    "description": "Kirby 3 Plugin for easier Security Headers setup",
+    "autoload": {
+        "files": [
+            "config.php"
+        ],
+        "psr-4": {
+            "Bnomei\\": "classes/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Bruno Meilick",
+            "email": "b@bnomei.com"
+        }
+    ],
+    "repositories": [
+        {
+          "type": "vcs",
+          "url": "https://github.com/k-next/kirby"
+        }
+      ],
+    "require": {
+        "getkirby/cms": "3.0.*",
+        "Martijnc/php-csp": "^1.0"
+      },
+      "minimum-stability": "beta"
+}
