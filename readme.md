@@ -2,7 +2,7 @@
 
 ![GitHub release](https://img.shields.io/github/release/bnomei/kirby3-securityheaders.svg?maxAge=1800) ![License](https://img.shields.io/github/license/mashape/apistatus.svg) ![Kirby Version](https://img.shields.io/badge/Kirby-3%2B-black.svg)
 
-Kirby 3 Plugin for easier Content Security Policy setup.
+Kirby 3 Plugin for easier Security Headers setup.
 
 ## Dependencies
 
