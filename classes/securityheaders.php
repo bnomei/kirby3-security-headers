@@ -6,7 +6,7 @@ class SecurityHeaders
 {
     private static function enabled()
     {
-        return option('bnomei.securityheaders.enabled') && !isWebpack() && !isLocalhost();
+        return option('bnomei.securityheaders.enabled') && !static::isWebpack() && !static::isLocalhost();
     }
 
     public static function headers($headers)
