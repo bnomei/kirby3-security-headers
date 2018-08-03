@@ -14,7 +14,7 @@ This plugin is free but if you use it in a commercial project please consider to
 
 ```php
 <?php
-  echo snippet('plugin-securityheaders');
+  snippet('plugin-securityheaders');
 ?><!DOCTYPE html>
 <!-- ... -->
 ```
