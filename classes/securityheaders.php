@@ -28,6 +28,17 @@ class SecurityHeaders
         }
     }
 
+    private static $nonces = null;
+    public static function nonce($string, $value = null) {
+        if(!static::$nonces) {
+            static::$nonces = [];
+        }
+        if($value && is_string($value)) {
+            static::$nonces[$string] = $value;
+        }
+        return \Kirby\Toolkit\A::get(static::$nonces, $string);
+    }
+
     private static function isWebpack()
     {
         return !!(

@@ -16,5 +16,14 @@ Kirby::plugin('bnomei/securityheaders', [
     ],
     'snippets' => [
         'plugin-securityheaders' => __DIR__ . '/snippets/securityheaders.php',
+    ],
+    'pageMethods' => [
+        'nonce' => function($string) {
+            $n = \Bnomei\SecurityHeaders::nonce($string);
+            if($n) {
+                $n = 'nonce="'.$n.'"';
+            }
+            return $n;
+        }
     ]
 ]);
