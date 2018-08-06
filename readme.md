@@ -4,6 +4,8 @@
 
 Kirby 3 Plugin for easier Security Headers setup.
 
+> Why should you use this plugin? Because security matters. Protecting your own or your clients websites and their customers data is important.
+
 This plugin is free but if you use it in a commercial project please consider to [make a donation 🍻](https://www.paypal.me/bnomei/5).
 
 ## Dependencies
@@ -11,6 +13,9 @@ This plugin is free but if you use it in a commercial project please consider to
 - https://github.com/Martijnc/php-csp
 
 ## Usage
+
+- Set headers before dumping any other string.
+- Do NOT leave a space between the snippet call and the doctype statement - because reasons.
 
 ```php
 <?php
@@ -21,9 +26,22 @@ This plugin is free but if you use it in a commercial project please consider to
 
 ## Settings
 
-TODO
+**enabled**
+- default: `true` will set headers
 
+**headers**
+- default: array of sensible default values. modify as needed.
 
+**csp**
+- default: `null` will limit all content to current domain in setting `default-src`, `style-src`, `script-src`, `image-src`, `font-src` and `connect-src`. It will NOT add `unsave inline` or `unsave eval` – do use nonces and hashes instead.
+
+**nonces**
+- default: `[]` allows you to define plain text strings which will be randomized each page refresh to an unique base64 encoded string and defined in header. Use `$page->nonce('plain-string')` to retrieve the nonce.
+
+> TIP: [kirby3-htmlhead](https://github.com/bnomei/kirby3-htmlhead) nonces are always defined.
+
+**hashes**
+- default: `[]` allows you to set valid hash definitions to headers.
 
 ## Disclaimer
 

@@ -11,8 +11,9 @@ Kirby::plugin('bnomei/securityheaders', [
             "strict-transport-security" => "max-age=31536000; includeSubdomains",
             "Referrer-Policy"           => "no-referrer-when-downgrade",
         ],
-        'nounces' => [],
-        'hashes' => []
+        'nonces' => [],
+        'hashes' => [],
+        'csp' => null, // callback
     ],
     'snippets' => [
         'plugin-securityheaders' => __DIR__ . '/snippets/securityheaders.php',
