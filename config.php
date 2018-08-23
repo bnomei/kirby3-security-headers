@@ -19,9 +19,12 @@ Kirby::plugin('bnomei/securityheaders', [
         'plugin-securityheaders' => __DIR__ . '/snippets/securityheaders.php',
     ],
     'pageMethods' => [
-        'nonce' => function($string) {
+        'nonce' => function($string, $plain = false) {
             $n = \Bnomei\SecurityHeaders::nonce($string);
-            if($n) {
+            if($plain && $n) {
+                return $n;
+            }
+            else if(!$plain && $n) {
                 $n = 'nonce="'.$n.'"';
             }
             return $n;
