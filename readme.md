@@ -6,7 +6,7 @@ Kirby 3 Plugin for easier Security Headers setup.
 
 > Why should you use this plugin? Because security matters. Protecting your own or your clients websites and their customers data is important.
 
-This plugin is free but if you use it in a commercial project please consider to [make a donation 🍻](https://www.paypal.me/bnomei/5).
+This plugin is free but if you use it in a commercial project please consider to [make a donation 🍻](https://www.paypal.me/bnomei/2.5).
 
 ## Dependencies
 
