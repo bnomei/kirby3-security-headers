@@ -4,15 +4,20 @@
 
 Kirby 3 Plugin for easier Security Headers setup.
 
-> Why should you use this plugin? Because security matters. Protecting your own or your clients websites and their customers data is important.
+> 🔐 Why should you use this plugin? Because security matters. Protecting your own or your clients websites and their customers data is important.
 
-This plugin is free but if you use it in a commercial project please consider to [make a donation 🍻](https://www.paypal.me/bnomei/2.5).
+## Commerical Usage
+
+This plugin is free but if you use it in a commercial project please consider to 
+- [make a donation 🍻](https://www.paypal.me/bnomei/2.5) or
+- [buy me ☕](https://buymeacoff.ee/bnomei) or
+- [buy a Kirby license using this affiliate link](https://a.paddle.com/v2/click/1129/35731?link=1170)
 
 ## Dependencies
 
 - https://github.com/Martijnc/php-csp
 
-## Usage
+## Setup
 
 - Set headers before dumping any other string.
 - Do NOT leave a space between the snippet call and the doctype statement - because reasons.
