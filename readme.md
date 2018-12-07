@@ -21,6 +21,7 @@ This plugin is free but if you use it in a commercial project please consider to
 
 - Set headers before dumping any other string.
 - Do NOT leave a space between the snippet call and the doctype statement - because reasons.
+- Read the [FAQs](https://github.com/bnomei/kirby3-security-headers/issues?q=is%3Aissue+is%3Aopen+label%3AFAQ).
 
 ```php
 <?php
