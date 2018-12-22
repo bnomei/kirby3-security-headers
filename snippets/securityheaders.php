@@ -21,7 +21,7 @@ if (!$csp) {
     foreach ($directives as $d) {
         $policy->addSourceSet($d, $sourcesetID);
     }
-} else if (is_callable($csp)) {
+} elseif (is_callable($csp)) {
     $policy = $csp($policy);
 }
 
