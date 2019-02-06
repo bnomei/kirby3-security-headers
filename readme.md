@@ -1,6 +1,6 @@
 # Kirby 3 Content Security Policy
 
-![GitHub release](https://img.shields.io/github/release/bnomei/kirby3-security-headers.svg?maxAge=1800) ![License](https://img.shields.io/github/license/mashape/apistatus.svg) ![Kirby Version](https://img.shields.io/badge/Kirby-3%2B-black.svg)
+![GitHub release](https://img.shields.io/github/release/bnomei/kirby3-security-headers.svg?maxAge=1800) ![License](https://img.shields.io/github/license/mashape/apistatus.svg) ![Kirby Version](https://img.shields.io/badge/Kirby-3%2B-black.svg) ![Kirby 3 Pluginkit](https://img.shields.io/badge/Pluginkit-YES-cca000.svg)
 
 Kirby 3 Plugin for easier Security Headers setup.
 
@@ -15,18 +15,21 @@ This plugin is free but if you use it in a commercial project please consider to
 
 ## Installation
 
-- for devkit-setup use `composer require bnomei/kirby3-security-headers` or
-- extract latest release of [kirby3-security-headers.zip](https://github.com/bnomei/kirby3-security-headers/releases/download/v1.0.4/kirby3-security-headers.zip) as folder `site/plugins/kirby3-security-headers`
-
-> Installation as a gitsubmodule is *not* supported.
-
+- unzip [master.zip](https://github.com/bnomei/kirby3-security-headers/archive/master.zip) as folder `site/plugins/kirby3-security-headers` or
+- `git submodule add https://github.com/bnomei/kirby3-security-headers.git site/plugins/kirby3-security-headers` or
+- `composer require bnomei/kirby3-security-headers`
 
 ## Dependencies
 
 - https://github.com/Martijnc/php-csp
 
-## Setup
+## Automatic Setup
 
+A `route:before`-hook will take care of setting the headers automatically on all non localhost/webpack setups.
+
+## Manual Setup
+
+- Set `bnomei.securityheader.route.before` to `false` in your config file.
 - Set headers before dumping any other string.
 - Do NOT leave a space between the snippet call and the doctype statement - because reasons.
 - Read the [FAQs](https://github.com/bnomei/kirby3-security-headers/issues?q=is%3Aissue+is%3Aopen+label%3AFAQ).
@@ -42,6 +45,9 @@ This plugin is free but if you use it in a commercial project please consider to
 
 **enabled**
 - default: `true` will set headers
+
+**route.before**
+- default: `true` will set headers with a `route:before`-hook
 
 **headers**
 - default: array of sensible default values. modify as needed.
