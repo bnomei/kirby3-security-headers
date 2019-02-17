@@ -29,7 +29,7 @@ A `route:before`-hook will take care of setting the headers automatically on all
 
 ## Manual Setup
 
-- Set `bnomei.securityheader.route.before` to `false` in your config file.
+- Set `bnomei.securityheaders.route.before` to `false` in your config file.
 - Set headers before dumping any other string.
 - Do NOT leave a space between the snippet call and the doctype statement - because reasons.
 - Read the [FAQs](https://github.com/bnomei/kirby3-security-headers/issues?q=is%3Aissue+is%3Aopen+label%3AFAQ).
