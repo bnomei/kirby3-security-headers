@@ -8,7 +8,16 @@ class SecurityHeaders
 {
     private static function enabled()
     {
-        return option('bnomei.securityheaders.enabled') && !static::isWebpack() && !static::isLocalhost();
+        $inPanel = static::isPanel() ? option('bnomei.securityheaders.enabled.panel') : true;
+        return option('bnomei.securityheaders.enabled') && $inPanel && !static::isWebpack() && !static::isLocalhost();
+    }
+
+    private static function isPanel()
+    {
+        return strpos(
+            kirby()->request()->url()->toString(),
+            kirby()->urls()->panel
+          ) !== false;
     }
 
     public static function headers($headers)
@@ -55,9 +64,13 @@ class SecurityHeaders
         return in_array($_SERVER['REMOTE_ADDR'], array( '127.0.0.1', '::1' ));
     }
 
-    public static function apply() {
-        // https://github.com/Martijnc/php-csp
+    public static function apply()
+    {
+        if (!static::enabled()) {
+            return;
+        }
 
+        // https://github.com/Martijnc/php-csp
         $policy = new ContentSecurityPolicyHeaderBuilder();
 
         $csp = option('bnomei.securityheaders.csp', []);

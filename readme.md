@@ -43,8 +43,13 @@ A `route:before`-hook will take care of setting the headers automatically on all
 
 ## Settings
 
+All settings need to be prefiex with `bnomei.securityheaders.`.
+
 **enabled**
 - default: `true` will set headers
+
+**enabled.panel**
+- default: `false` will not set headers in panel
 
 **route.before**
 - default: `true` will set headers with a `route:before`-hook

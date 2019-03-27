@@ -5,6 +5,7 @@
 Kirby::plugin('bnomei/securityheaders', [
     'options' => [
         'enabled' => true,
+        'enabled.panel' => false,
         'route.before' => true,
         'headers' => [
             "X-Powered-By"              => "", // unset
