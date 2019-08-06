@@ -29,7 +29,7 @@
     },
     "require": {
         "php": ">=7.1.0",
-        "Martijnc/php-csp": "^1.0",
+        "martijnc/php-csp": "^1.0",
         "getkirby/composer-installer": "^1.1"
     }
 }

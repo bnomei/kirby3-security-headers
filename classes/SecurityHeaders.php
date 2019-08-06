@@ -17,7 +17,7 @@ class SecurityHeaders
         return strpos(
             kirby()->request()->url()->toString(),
             kirby()->urls()->panel
-          ) !== false;
+        ) !== false;
     }
 
     public static function headers($headers)
@@ -53,15 +53,13 @@ class SecurityHeaders
 
     private static function isWebpack()
     {
-        return !!(
-            isset($_SERVER['HTTP_X_FORWARDED_FOR'])
-            && $_SERVER['HTTP_X_FORWARDED_FOR'] == 'webpack'
-        );
+        return !!(isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+            && $_SERVER['HTTP_X_FORWARDED_FOR'] == 'webpack');
     }
 
     private static function isLocalhost()
     {
-        return in_array($_SERVER['REMOTE_ADDR'], array( '127.0.0.1', '::1' ));
+        return !array_key_exists('REMOTE_ADDR', $_SERVER) || in_array($_SERVER['REMOTE_ADDR'], array('127.0.0.1', '::1'));
     }
 
     public static function apply()
@@ -98,7 +96,7 @@ class SecurityHeaders
         foreach ($nc as $id) {
             $nonceArr = [$id, time(), \filemtime(__FILE__), kirby()->roots()->assets()];
             shuffle($nonceArr);
-            $nonce = 'nonce-'.base64_encode(sha1(implode('', $nonceArr)));
+            $nonce = 'nonce-' . base64_encode(sha1(implode('', $nonceArr)));
             static::nonce($id, $nonce);
             $policy->addNonce(ContentSecurityPolicyHeaderBuilder::DIRECTIVE_SCRIPT_SRC, $nonce);
         }
