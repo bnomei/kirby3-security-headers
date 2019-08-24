@@ -2,7 +2,9 @@
 
 namespace Bnomei;
 
+use Kirby\Toolkit\A;
 use Phpcsp\Security\ContentSecurityPolicyHeaderBuilder;
+use function filemtime;
 
 class SecurityHeaders
 {
@@ -48,7 +50,7 @@ class SecurityHeaders
         if ($value && is_string($value)) {
             static::$nonces[$string] = $value;
         }
-        return \Kirby\Toolkit\A::get(static::$nonces, $string);
+        return A::get(static::$nonces, $string);
     }
 
     private static function isWebpack()
@@ -94,7 +96,7 @@ class SecurityHeaders
         $nc = ['loadjs.min.js', 'loadjs.min.js-fn', 'webfontloader.js']; // https://github.com/bnomei/kirby3-htmlhead
         $nc = array_merge($nc, option('bnomei.securityheaders.nonces', []));
         foreach ($nc as $id) {
-            $nonceArr = [$id, time(), \filemtime(__FILE__), kirby()->roots()->assets()];
+            $nonceArr = [$id, time(), filemtime(__FILE__), kirby()->roots()->assets()];
             shuffle($nonceArr);
             $nonce = 'nonce-' . base64_encode(sha1(implode('', $nonceArr)));
             static::nonce($id, $nonce);

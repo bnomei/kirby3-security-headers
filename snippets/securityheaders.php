@@ -1,4 +1,7 @@
 <?php
+
+use Bnomei\SecurityHeaders;
+
 if (!option('bnomei.securityheaders.route.before')) {
-    \Bnomei\SecurityHeaders::apply();
+    SecurityHeaders::apply();
 }
