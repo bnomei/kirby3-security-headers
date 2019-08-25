@@ -53,5 +53,8 @@
   },
   "extra": {
     "kirby-cms-path": "tests/kirby"
+  },
+  "suggest": {
+    "bnomei/kirby3-doctor": "Add a panel button to check health and security of your Kirby installation"
   }
 }
