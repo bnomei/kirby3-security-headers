@@ -1,4 +1,4 @@
-# Kirby 3 Content Security Policy
+# Kirby 3 Content Security Policy Header
 
 ![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-security-headers?color=ae81ff)
 ![Stars](https://flat.badgen.net/packagist/ghs/bnomei/kirby3-security-headers?color=272822)
