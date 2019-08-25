@@ -10,8 +10,6 @@
 [![Gitter](https://flat.badgen.net/badge/gitter/chat?color=982ab3)](https://gitter.im/bnomei-kirby-3-plugins/community) 
 [![Twitter](https://flat.badgen.net/badge/twitter/bnomei?color=66d9ef)](https://twitter.com/bnomei)
 
-
-
 Kirby 3 Plugin for easier Security Headers setup.
 
 > 🔐 Why should you use this plugin? Because security matters. Protecting your own or your clients websites and their customers data is important.
@@ -28,10 +26,6 @@ This plugin is free but if you use it in a commercial project please consider to
 - unzip [master.zip](https://github.com/bnomei/kirby3-security-headers/archive/master.zip) as folder `site/plugins/kirby3-security-headers` or
 - `git submodule add https://github.com/bnomei/kirby3-security-headers.git site/plugins/kirby3-security-headers` or
 - `composer require bnomei/kirby3-security-headers`
-
-## Dependencies
-
-- https://github.com/Martijnc/php-csp
 
 ## Automatic Setup
 
@@ -53,30 +47,21 @@ A `route:before`-hook will take care of setting the headers automatically on all
 
 ## Settings
 
-All settings need to be prefiex with `bnomei.securityheaders.`.
-
-**enabled**
-- default: `true` will set headers
-
-**enabled.panel**
-- default: `false` will not set headers in panel
-
-**route.before**
-- default: `true` will set headers with a `route:before`-hook
-
-**headers**
-- default: array of sensible default values. modify as needed.
-
-**csp**
-- default: `null` will limit all content to current domain in setting `default-src`, `style-src`, `script-src`, `image-src`, `font-src` and `connect-src`. It will NOT add `unsave inline` or `unsave eval` – do use nonces and hashes instead.
-
-**nonces**
-- default: `[]` allows you to define plain text strings which will be randomized each page refresh to an unique base64 encoded string and defined in header. Use `$page->nonce('plain-string')` to retrieve the nonce.
+| bnomei.securityheaders.   | Default        | Description               |            
+|---------------------------|----------------|---------------------------|
+| enabled | `true` | will set headers |
+| enabled.panel | `false` | will not set headers in panel |
+| route.before | `true` | will set headers with a `route:before`-hook |
+| headers | array of  |sensible default values. modify as needed. |
+| csp | `null` | will limit all content to current domain in setting `default-src`, `style-src`, `script-src`, `image-src`, `font-src` and `connect-src`. It will NOT add `unsave inline` or `unsave eval` – do use nonces and hashes instead. |
+| nonces | `[]` | allows you to define plain text strings which will be randomized each page refresh to an unique base64 encoded string and defined in header. Use `$page->nonce('plain-string')` to retrieve the nonce. |
+| hashes | `[]` | allows you to set valid hash definitions to headers. |
 
 > TIP: [kirby3-htmlhead](https://github.com/bnomei/kirby3-htmlhead) nonces are always defined.
 
-**hashes**
-- default: `[]` allows you to set valid hash definitions to headers.
+## Dependencies
+ 
+ - [Martijnc/php-csp](https://github.com/Martijnc/php-csp)
 
 ## Disclaimer
 
