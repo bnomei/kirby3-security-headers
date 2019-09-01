@@ -1,112 +1,205 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bnomei;
 
+use Kirby\Data\Json;
+use Kirby\Data\Yaml;
 use Kirby\Toolkit\A;
-use Phpcsp\Security\ContentSecurityPolicyHeaderBuilder;
-use function filemtime;
+use Kirby\Toolkit\F;
+use Kirby\Toolkit\Mime;
+use ParagonIE\CSPBuilder\CSPBuilder;
+use function header;
 
-class SecurityHeaders
+final class SecurityHeaders
 {
-    private static function enabled()
+    /*
+     * @var array
+     */
+    private $options;
+
+    /*
+     * @var ParagonIE\CSPBuilder\CSPBuilder
+     */
+    private $cspBuilder;
+
+    /*
+     * @var array
+     */
+    private $nonces;
+
+    public function __construct(array $options = [])
     {
-        $inPanel = static::isPanel() ? option('bnomei.securityheaders.enabled.panel') : true;
-        return option('bnomei.securityheaders.enabled') && $inPanel && !static::isWebpack() && !static::isLocalhost();
-    }
+        $defaults = [
+            'debug' => option('debug'),
+            'loader' => option('bnomei.securityheaders.loader'),
+            'enabled' => option('enabled', !kirby()->system()->isLocal()),
+            'headers' => option('bnomei.securityheaders.headers'),
+            'panelnonces' => method_exists(kirby()->system(), 'nonces') ? kirby()->system()->nonces() : [],
+            'setter' => option('bnomei.securityheaders.setter'),
+        ];
+        $this->options = array_merge($defaults, $options);
+        $this->nonces = [];
 
-    private static function isPanel()
-    {
-        return strpos(
-            kirby()->request()->url()->toString(),
-            kirby()->urls()->panel
-        ) !== false;
-    }
-
-    public static function headers($headers)
-    {
-        if (!static::enabled()) {
-            return;
-        }
-        $options = option('bnomei.securityheaders.headers', []);
-        $optionsKV = array_map(function ($k, $v) {
-            return [
-                'name'  => $k,
-                'value' => $v,
-            ];
-        }, array_keys($options), $options);
-        $headers = array_merge($headers, $optionsKV);
-
-        foreach ($headers as $h) {
-            header(sprintf('%s: %s', $h['name'], $h['value']));
-        }
-    }
-
-    private static $nonces = null;
-    public static function nonce($string, $value = null)
-    {
-        if (!static::$nonces) {
-            static::$nonces = [];
-        }
-        if ($value && is_string($value)) {
-            static::$nonces[$string] = $value;
-        }
-        return A::get(static::$nonces, $string);
-    }
-
-    private static function isWebpack()
-    {
-        return !!(isset($_SERVER['HTTP_X_FORWARDED_FOR'])
-            && $_SERVER['HTTP_X_FORWARDED_FOR'] == 'webpack');
-    }
-
-    private static function isLocalhost()
-    {
-        return !array_key_exists('REMOTE_ADDR', $_SERVER) || in_array($_SERVER['REMOTE_ADDR'], array('127.0.0.1', '::1'));
-    }
-
-    public static function apply()
-    {
-        if (!static::enabled()) {
-            return;
-        }
-
-        // https://github.com/Martijnc/php-csp
-        $policy = new ContentSecurityPolicyHeaderBuilder();
-
-        $csp = option('bnomei.securityheaders.csp', []);
-        if (!$csp) {
-            $sourcesetID = kirby()->site()->title()->value();
-            $policy->defineSourceSet($sourcesetID, [kirby()->site()->url()]);
-
-            $directives = [
-                ContentSecurityPolicyHeaderBuilder::DIRECTIVE_DEFAULT_SRC,
-                ContentSecurityPolicyHeaderBuilder::DIRECTIVE_STYLE_SRC,
-                ContentSecurityPolicyHeaderBuilder::DIRECTIVE_SCRIPT_SRC,
-                ContentSecurityPolicyHeaderBuilder::DIRECTIVE_IMG_SRC,
-                ContentSecurityPolicyHeaderBuilder::DIRECTIVE_FONT_SRC,
-                ContentSecurityPolicyHeaderBuilder::DIRECTIVE_CONNECT_SRC,
-            ];
-            foreach ($directives as $d) {
-                $policy->addSourceSet($d, $sourcesetID);
+        foreach ($this->options as $key => $call) {
+            if (is_callable($call) && in_array($key, ['loader', 'enabled', 'headers'])) {
+                $this->options[$key] = $call();
             }
-        } elseif (is_callable($csp)) {
-            $policy = $csp($policy);
+        }
+    }
+
+    /**
+     * @return array|misc
+     */
+    public function option(?string $key = null)
+    {
+        if ($key) {
+            return A::get($this->options, $key);
+        }
+        return $this->options;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNonce(string $key): ?string
+    {
+        return A::get($this->nonces, $key);
+    }
+
+    /**
+     * @param string
+     */
+    public function setNonce(string $key): string
+    {
+        $nonceArr = [$key, time(), filemtime(__FILE__), kirby()->roots()->assets()];
+        shuffle($nonceArr);
+        $nonce = 'nonce-' . base64_encode(sha1(implode('', $nonceArr)));
+
+        $this->nonces[$key] = $nonce;
+        return $nonce;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function csp()
+    {
+        return $this->cspBuilder;
+    }
+
+    /**
+     * @param null $data
+     * @return CSPBuilder
+     */
+    public function load($data = null): CSPBuilder
+    {
+        if (is_null($data)) {
+            $data = $this->option('loader');
         }
 
-        $nc = ['loadjs.min.js', 'loadjs.min.js-fn', 'webfontloader.js']; // https://github.com/bnomei/kirby3-htmlhead
-        $nc = array_merge($nc, option('bnomei.securityheaders.nonces', []));
-        foreach ($nc as $id) {
-            $nonceArr = [$id, time(), filemtime(__FILE__), kirby()->roots()->assets()];
-            shuffle($nonceArr);
-            $nonce = 'nonce-' . base64_encode(sha1(implode('', $nonceArr)));
-            static::nonce($id, $nonce);
-            $policy->addNonce(ContentSecurityPolicyHeaderBuilder::DIRECTIVE_SCRIPT_SRC, $nonce);
+        if (is_string($data) && F::exists($data)) {
+            $mime = F::mime($data);
+            $data = F::read($data);
+            if (in_array($mime, A::get(Mime::types(), 'json'))) {
+                $data = Json::decode($data);
+            } elseif (A::get(Mime::types(), 'yaml') && in_array($mime, A::get(Mime::types(), 'yaml'))) {
+                // TODO: kirby has no mime yaml yet. pending issue.
+                $data = Yaml::decode($data);
+            }
         }
-        foreach (option('bnomei.securityheaders.hashes', []) as $h) {
-            $policy->addHash(ContentSecurityPolicyHeaderBuilder::HASH_SHA_256, $h);
-            // hash(ContentSecurityPolicyHeaderBuilder::HASH_SHA_256, $script, true)
+        if (is_array($data)) {
+            $this->cspBuilder = CSPBuilder::fromArray($data);
+        } else {
+            $this->cspBuilder = new CSPBuilder();
         }
 
-        static::headers($policy->getHeaders(true));
+        // add panel nonces
+        $panelnonces = $this->option('panelnonces');
+        foreach ($panelnonces as $nonce) {
+            // TODO: kirby has no panel nonces yet. pending issue.
+            $this->cspBuilder->nonce('script-src', $nonce);
+        }
+
+        return $this->cspBuilder;
+    }
+
+    /**
+     *
+     */
+    public function applySetter()
+    {
+        // additional setters
+        $csp = $this->option('setter');
+        if (is_callable($csp)) {
+            $csp($this);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    public function sendHeaders(): bool
+    {
+        if ($this->option('debug') || $this->option('enabled') !== true) {
+            return false;
+        }
+
+        // from config
+        $headers = $this->option('headers');
+        foreach ($headers as $key => $value) {
+            header($key . ': ' . $value);
+        }
+
+        // from cspbuilder
+        if($this->cspBuilder) {
+            $this->cspBuilder->sendCSPHeader();
+        }
+        return true;
+    }
+
+    /**
+     * @param string $filepath
+     * @return bool
+     */
+    public function saveApache(string $filepath): bool
+    {
+        $this->cspBuilder->saveSnippet($filepath, CSPBuilder::FORMAT_APACHE);
+        return F::exists($filepath);
+    }
+
+    /**
+     * @param string $filepath
+     * @return bool
+     */
+    public function saveNginx(string $filepath): bool
+    {
+        $this->cspBuilder->saveSnippet($filepath, CSPBuilder::FORMAT_NGINX);
+        return F::exists($filepath);
+    }
+
+    /*
+     * @var SecurityHeaders
+     */
+    private static $singleton;
+
+    /**
+     * @param array $options
+     * @return SecurityHeaders
+     * @codeCoverageIgnore
+     */
+    public static function singleton(array $options = []): SecurityHeaders
+    {
+        if (self::$singleton) {
+            return self::$singleton;
+        }
+
+        $sec = new SecurityHeaders($options);
+        $sec->load();
+        $sec->applySetter();
+        self::$singleton = $sec;
+
+        return self::$singleton;
     }
 }

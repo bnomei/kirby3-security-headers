@@ -1,0 +1,42 @@
+{
+  "report-only": false,
+  "base-uri": {
+    "self": true
+  },
+  "default-src": {
+    "self": true
+  },
+  "child-src": {
+    "allow": [],
+    "self": false
+  },
+  "connect-src": {
+    "self": true
+  },
+  "font-src": {
+    "self": true
+  },
+  "form-action": {
+    "allow": [],
+    "self": true
+  },
+  "frame-ancestors": [],
+  "img-src": {
+    "self": true,
+    "data": true
+  },
+  "media-src": [],
+  "object-src": [],
+  "plugin-types": [],
+  "script-src": {
+    "allow": [],
+    "hashes": [],
+    "self": true,
+    "unsafe-inline": false,
+    "unsafe-eval": false
+  },
+  "style-src": {
+    "self": true
+  },
+  "upgrade-insecure-requests": true
+}

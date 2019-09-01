@@ -4,9 +4,14 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInite24f567ab47db4592a598e3f98fa7822
+class ComposerStaticInit8e11c319fcee8e4145808a6f30842e69
 {
     public static $prefixLengthsPsr4 = array (
+        'P' => 
+        array (
+            'ParagonIE\\ConstantTime\\' => 23,
+            'ParagonIE\\CSPBuilder\\' => 21,
+        ),
         'K' => 
         array (
             'Kirby\\' => 6,
@@ -18,6 +23,14 @@ class ComposerStaticInite24f567ab47db4592a598e3f98fa7822
     );
 
     public static $prefixDirsPsr4 = array (
+        'ParagonIE\\ConstantTime\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
+        ),
+        'ParagonIE\\CSPBuilder\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/paragonie/csp-builder/src',
+        ),
         'Kirby\\' => 
         array (
             0 => __DIR__ . '/..' . '/getkirby/composer-installer/src',
@@ -28,36 +41,32 @@ class ComposerStaticInite24f567ab47db4592a598e3f98fa7822
         ),
     );
 
-    public static $prefixesPsr0 = array (
-        'P' => 
-        array (
-            'Phpcsp' => 
-            array (
-                0 => __DIR__ . '/..' . '/martijnc/php-csp/src',
-            ),
-        ),
-    );
-
     public static $classMap = array (
         'Bnomei\\SecurityHeaders' => __DIR__ . '/../..' . '/classes/SecurityHeaders.php',
         'Kirby\\ComposerInstaller\\CmsInstaller' => __DIR__ . '/..' . '/getkirby/composer-installer/src/ComposerInstaller/CmsInstaller.php',
         'Kirby\\ComposerInstaller\\Installer' => __DIR__ . '/..' . '/getkirby/composer-installer/src/ComposerInstaller/Installer.php',
         'Kirby\\ComposerInstaller\\Plugin' => __DIR__ . '/..' . '/getkirby/composer-installer/src/ComposerInstaller/Plugin.php',
         'Kirby\\ComposerInstaller\\PluginInstaller' => __DIR__ . '/..' . '/getkirby/composer-installer/src/ComposerInstaller/PluginInstaller.php',
-        'Phpcsp\\Security\\ContentSecurityPolicyHeaderBuilder' => __DIR__ . '/..' . '/martijnc/php-csp/src/Phpcsp/Security/ContentSecurityPolicyHeaderBuilder.php',
-        'Phpcsp\\Security\\InvalidDirectiveException' => __DIR__ . '/..' . '/martijnc/php-csp/src/Phpcsp/Security/InvalidDirectiveException.php',
-        'Phpcsp\\Security\\InvalidOriginException' => __DIR__ . '/..' . '/martijnc/php-csp/src/Phpcsp/Security/InvalidOriginException.php',
-        'Phpcsp\\Security\\InvalidValueException' => __DIR__ . '/..' . '/martijnc/php-csp/src/Phpcsp/Security/InvalidValueException.php',
-        'Phpcsp\\Security\\SourceSetNotFoundException' => __DIR__ . '/..' . '/martijnc/php-csp/src/Phpcsp/Security/SourceSetNotFoundException.php',
+        'ParagonIE\\CSPBuilder\\CSPBuilder' => __DIR__ . '/..' . '/paragonie/csp-builder/src/CSPBuilder.php',
+        'ParagonIE\\ConstantTime\\Base32' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base32.php',
+        'ParagonIE\\ConstantTime\\Base32Hex' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base32Hex.php',
+        'ParagonIE\\ConstantTime\\Base64' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base64.php',
+        'ParagonIE\\ConstantTime\\Base64DotSlash' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base64DotSlash.php',
+        'ParagonIE\\ConstantTime\\Base64DotSlashOrdered' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base64DotSlashOrdered.php',
+        'ParagonIE\\ConstantTime\\Base64UrlSafe' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Base64UrlSafe.php',
+        'ParagonIE\\ConstantTime\\Binary' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Binary.php',
+        'ParagonIE\\ConstantTime\\EncoderInterface' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/EncoderInterface.php',
+        'ParagonIE\\ConstantTime\\Encoding' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Encoding.php',
+        'ParagonIE\\ConstantTime\\Hex' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Hex.php',
+        'ParagonIE\\ConstantTime\\RFC4648' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/RFC4648.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInite24f567ab47db4592a598e3f98fa7822::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInite24f567ab47db4592a598e3f98fa7822::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInite24f567ab47db4592a598e3f98fa7822::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInite24f567ab47db4592a598e3f98fa7822::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit8e11c319fcee8e4145808a6f30842e69::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit8e11c319fcee8e4145808a6f30842e69::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit8e11c319fcee8e4145808a6f30842e69::$classMap;
 
         }, null, ClassLoader::class);
     }

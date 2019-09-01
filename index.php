@@ -5,39 +5,65 @@
 Kirby::plugin('bnomei/securityheaders', [
     'options' => [
         'enabled' => true,
-        'enabled.panel' => false,
-        'route.before' => true,
         'headers' => [
-            "X-Powered-By"              => "", // unset
-            "X-Frame-Options"           => "SAMEORIGIN",
-            "X-XSS-Protection"          => "1; mode=block",
-            "X-Content-Type-Options"    => "nosniff",
+            "X-Powered-By" => "", // unset
+            "X-Frame-Options" => "SAMEORIGIN",
+            "X-XSS-Protection" => "1; mode=block",
+            "X-Content-Type-Options" => "nosniff",
             "strict-transport-security" => "max-age=31536000; includeSubdomains",
-            "Referrer-Policy"           => "no-referrer-when-downgrade",
+            "Referrer-Policy" => "no-referrer-when-downgrade",
         ],
-        'nonces' => [],
-        'hashes' => [],
-        'csp' => null, // callback
-    ],
-    'snippets' => [
-        'plugin-securityheaders' => __DIR__ . '/snippets/securityheaders.php',
+        'loader' => function () {
+            // https://github.com/paragonie/csp-builder#example
+            // null if you do NOT want to use default and/or just the setter
+            /*
+                return null;
+             */
+            // return path of file (json or yaml)
+            // or an array of options for the cspbuilder
+            /*
+                return [...];
+                return kirby()->roots()->site() . '/your-csp.json';
+                return kirby()->roots()->site() . '/your-csp.yml';
+            */
+            // otherwise forward the default file from this plugin
+            return __DIR__ . '/loader.json';
+        },
+        'setter' => function (\Bnomei\SecurityHeaders $instance): void {
+            // https://github.com/paragonie/csp-builder#build-a-content-security-policy-programmatically
+            /*
+                $csp = $instance->csp();
+                $nonce = $instance->setNonce('my-inline-script');
+                $csp->nonce('script-src', $nonce);
+            */
+            // in your template retrieve it again with
+            /*
+                $nonce = $page->nonce('my-inline-script');
+                => `THIS-IS-THE-NONCE`
+                $attr = $page->nonceAttr('my-inline-script');
+                => `nonce="THIS-IS-THE-NONCE"`
+            */
+        },
     ],
     'hooks' => [
-        'route:before' => function () {
-            if (option('bnomei.securityheaders.route.before')) {
-                \Bnomei\SecurityHeaders::apply();
+        'route:before' => function (): void {
+            if (option('bnomei.securityheaders.enabled')) {
+                \Bnomei\SecurityHeaders::singleton()->sendHeaders();
             }
         },
     ],
     'pageMethods' => [
-        'nonce' => function ($string, $plain = false) {
-            $n = \Bnomei\SecurityHeaders::nonce($string);
-            if ($plain && $n) {
-                return $n;
-            } elseif (!$plain && $n) {
-                $n = 'nonce="'.$n.'"';
-            }
-            return $n;
-        }
-    ]
+        'nonce' => function (string $key): string {
+            return \Bnomei\SecurityHeaders::singleton()->getNonce($key);
+        },
+        'nonceAttr' => function (string $key): string {
+            return implode(
+                [
+                    'nonce="',
+                    \Bnomei\SecurityHeaders::singleton()->getNonce($key),
+                    '"',
+                ]
+            );
+        },
+    ],
 ]);
