@@ -31,12 +31,19 @@ final class SecurityHeaders
 
     public function __construct(array $options = [])
     {
+        $isPanel = strpos(
+                kirby()->request()->url()->toString(),
+                kirby()->urls()->panel
+            ) !== false;
+        $panelHasNonces =  method_exists(kirby()->system(), 'nonces');
+        $enabled = !kirby()->system()->isLocal() && ($isPanel && $panelHasNonces);
+
         $defaults = [
             'debug' => option('debug'),
             'loader' => option('bnomei.securityheaders.loader'),
-            'enabled' => option('enabled', !kirby()->system()->isLocal()),
+            'enabled' => option('enabled', $enabled),
             'headers' => option('bnomei.securityheaders.headers'),
-            'panelnonces' => method_exists(kirby()->system(), 'nonces') ? kirby()->system()->nonces() : [],
+            'panelnonces' => $panelHasNonces ? kirby()->system()->nonces() : [],
             'setter' => option('bnomei.securityheaders.setter'),
         ];
         $this->options = array_merge($defaults, $options);
@@ -153,7 +160,7 @@ final class SecurityHeaders
         }
 
         // from cspbuilder
-        if($this->cspBuilder) {
+        if ($this->cspBuilder) {
             $this->cspBuilder->sendCSPHeader();
         }
         return true;
