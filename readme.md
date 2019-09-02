@@ -66,7 +66,7 @@ return [
 
 ### Loader
 
-The Loader is used to initally create the CSPBuilder object with a given set of data. You skip that, forward a file to load, provide an array or [use the default loader file](https://github.com/bnomei/kirby3-security-headers/master/loader.json). Using a custom file is recommended when for example adding additional font-src for google web fonts. 
+The Loader is used to initally create the CSPBuilder object with a given set of data. You skip that, forward a file to load, provide an array or [use the default loader file](https://github.com/bnomei/kirby3-security-headers/blob/master/loader.json). Using a custom file is recommended when for example adding additional font-src for google web fonts. 
 
 **/site/config/config.php**
 ```php
