@@ -36,7 +36,11 @@ final class SecurityHeaders
                 kirby()->urls()->panel
             ) !== false;
         $panelHasNonces =  method_exists(kirby()->system(), 'nonces');
-        $enabled = !kirby()->system()->isLocal() && ($isPanel && $panelHasNonces);
+
+        $enabled = !kirby()->system()->isLocal();
+        if ($isPanel && !$panelHasNonces) {
+            $enabled = false;
+        }
 
         $defaults = [
             'debug' => option('debug'),
