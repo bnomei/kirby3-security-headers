@@ -35,7 +35,7 @@ final class SecurityHeaders
                 kirby()->request()->url()->toString(),
                 kirby()->urls()->panel
             ) !== false;
-        $panelHasNonces =  method_exists(kirby()->system(), 'nonces');
+        $panelHasNonces =  method_exists(kirby(), 'nonce');
 
         $enabled = !kirby()->system()->isLocal();
         if ($isPanel && !$panelHasNonces) {
@@ -47,7 +47,7 @@ final class SecurityHeaders
             'loader' => option('bnomei.securityheaders.loader'),
             'enabled' => option('enabled', $enabled),
             'headers' => option('bnomei.securityheaders.headers'),
-            'panelnonces' => $panelHasNonces ? kirby()->system()->nonces() : [],
+            'panelnonces' => $panelHasNonces ? ['panel' => kirby()->nonce()] : [],
             'setter' => option('bnomei.securityheaders.setter'),
         ];
         $this->options = array_merge($defaults, $options);
