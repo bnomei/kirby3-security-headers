@@ -38,7 +38,7 @@ This plugin is free but if you use it in a commercial project please consider to
 
 ### Automatic
 
-A `route:before`-hook takes care of setting the headers automatically unless one of the following condition applies:
+A `route:before`-hook takes care of setting the headers automatically unless one of the following conditions applies:
 
 - Kirbys **global** debug mode is `true`
 - Kirby determins it is a [local setup](https://github.com/getkirby/kirby/blob/03d6e96aa27f631e5311cb6c2109e1510505cab7/src/Cms/System.php#L190)
@@ -91,8 +91,6 @@ return [
     // other options...
 ];
 ```
-
-> WARNING: Loader from yaml does not work yet until [kirby adds the yaml mime type](https://github.com/getkirby/kirby/issues/2018).
 
 ### Setter
 
