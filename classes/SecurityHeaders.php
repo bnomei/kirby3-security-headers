@@ -45,8 +45,9 @@ final class SecurityHeaders
         $defaults = [
             'debug' => option('debug'),
             'loader' => option('bnomei.securityheaders.loader'),
-            'enabled' => option('enabled', $enabled),
+            'enabled' => option('bnomei.securityheaders.enabled', $enabled),
             'headers' => option('bnomei.securityheaders.headers'),
+            'panel' => $isPanel,
             'panelnonces' => $panelHasNonces ? ['panel' => kirby()->nonce()] : [],
             'setter' => option('bnomei.securityheaders.setter'),
         ];
@@ -86,7 +87,7 @@ final class SecurityHeaders
     {
         $nonceArr = [$key, time(), filemtime(__FILE__), kirby()->roots()->assets()];
         shuffle($nonceArr);
-        $nonce = 'nonce-' . base64_encode(sha1(implode('', $nonceArr)));
+        $nonce = base64_encode(sha1(implode('', $nonceArr)));
 
         $this->nonces[$key] = $nonce;
         return $nonce;
@@ -116,7 +117,6 @@ final class SecurityHeaders
             if (in_array($mime, A::get(Mime::types(), 'json'))) {
                 $data = Json::decode($data);
             } elseif (A::get(Mime::types(), 'yaml') && in_array($mime, A::get(Mime::types(), 'yaml'))) {
-                // TODO: kirby has no mime yaml yet. pending issue.
                 $data = Yaml::decode($data);
             }
         }
@@ -127,9 +127,13 @@ final class SecurityHeaders
         }
 
         // add panel nonces
-        $panelnonces = $this->option('panelnonces');
-        foreach ($panelnonces as $nonce) {
-            $this->cspBuilder->nonce('script-src', $nonce);
+        if ($this->option('panel')) {
+            $panelnonces = $this->option('panelnonces');
+            foreach ($panelnonces as $nonce) {
+                $this->cspBuilder->nonce('img-src', $nonce);
+                $this->cspBuilder->nonce('script-src', $nonce);
+                $this->cspBuilder->nonce('style-src', $nonce);
+            }
         }
 
         return $this->cspBuilder;

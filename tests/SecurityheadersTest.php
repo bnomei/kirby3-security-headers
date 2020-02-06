@@ -48,7 +48,7 @@ final class SecurityheadersTest extends TestCase
     {
         $sec = new Bnomei\SecurityHeaders();
         $this->assertIsArray($sec->option());
-        $this->assertCount(6, $sec->option());
+        $this->assertCount(7, $sec->option());
 
         $this->assertNull($sec->option('debug'));
 
@@ -149,7 +149,7 @@ final class SecurityheadersTest extends TestCase
     {
         $sec = new Bnomei\SecurityHeaders();
         $n = $sec->setNonce('test');
-        $this->assertRegExp('/^nonce-(.){54}==$/', $n);
+        $this->assertRegExp('/^(.){54}==$/', $n);
         $this->assertEquals($n, $sec->getNonce('test'));
     }
 }
