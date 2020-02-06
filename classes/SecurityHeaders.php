@@ -129,7 +129,6 @@ final class SecurityHeaders
         // add panel nonces
         $panelnonces = $this->option('panelnonces');
         foreach ($panelnonces as $nonce) {
-            // TODO: kirby has no panel nonces yet. pending issue.
             $this->cspBuilder->nonce('script-src', $nonce);
         }
 
