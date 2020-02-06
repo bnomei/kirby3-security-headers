@@ -45,7 +45,7 @@ final class SecurityHeaders
         $defaults = [
             'debug' => option('debug'),
             'loader' => option('bnomei.securityheaders.loader'),
-            'enabled' => option('enabled', $enabled),
+            'enabled' => option('bnomei.securityheaders.enabled', $enabled),
             'headers' => option('bnomei.securityheaders.headers'),
             'panelnonces' => $panelHasNonces ? ['panel' => kirby()->nonce()] : [],
             'setter' => option('bnomei.securityheaders.setter'),
