@@ -19,6 +19,7 @@ Kirby 3 Plugin for easier Security Headers setup.
 1. [Setup: Headers](https://github.com/bnomei/kirby3-security-headers#headers)
 1. [Setup: Loader](https://github.com/bnomei/kirby3-security-headers#loader)
 1. [Setup: Setter](https://github.com/bnomei/kirby3-security-headers#setter)
+1. [Frontend Nonce](https://github.com/bnomei/kirby3-security-headers#frontend-nonce)
 1. [Settings](https://github.com/bnomei/kirby3-security-headers#settings)
 
 ## Commerical Usage
@@ -121,12 +122,25 @@ return [
 
 > TIP: nonces are set in the `setter` and later retrieved using `$page->nonce(...)` or `$page->nonceAttr(...)`.
 
+## Panel and Frontend Nonces
+
+This plugin automatically registers Kirbys nonce for the panel. For convenience it also provides you with a single *frontend nonce* to use as attribute in `<link>`, `<style>` and `<script>` elements.
+
+```php
+<script <?= $page->nonceAttr(site()->url()) ?>>
+// ...
+</script>
+```
+
+> TIP: The [srcset plugin](https://github.com/bnomei/kirby3-srcset/) uses that frontend nonce as well.
+
 ## Settings
 
 | bnomei.securityheaders.   | Default        | Description               |            
 |---------------------------|----------------|---------------------------|
 | enabled | `true` | will set headers |
-| headers | `array` | of  sensible default values. modify as needed. |
+| seed | `callback` | returns a seed for frontend nonce |
+| headers | `array` | of sensible default values. modify as needed. |
 | loader | `callback` | returning filepath or array |
 | setter | `callback` |  instance which allows customizing the CSPBuilder |
 

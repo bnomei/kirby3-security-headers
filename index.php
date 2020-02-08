@@ -5,6 +5,9 @@
 Kirby::plugin('bnomei/securityheaders', [
     'options' => [
         'enabled' => true,
+        'seed' => function () {
+            return site()->url();
+        },
         'headers' => [
             "X-Powered-By" => "", // unset
             "X-Frame-Options" => "SAMEORIGIN",

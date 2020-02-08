@@ -47,6 +47,7 @@ final class SecurityHeaders
             'loader' => option('bnomei.securityheaders.loader'),
             'enabled' => option('bnomei.securityheaders.enabled', $enabled),
             'headers' => option('bnomei.securityheaders.headers'),
+            'seed' => option('bnomei.securityheaders.seed'),
             'panel' => $isPanel,
             'panelnonces' => $panelHasNonces ? ['panel' => kirby()->nonce()] : [],
             'setter' => option('bnomei.securityheaders.setter'),
@@ -55,7 +56,7 @@ final class SecurityHeaders
         $this->nonces = [];
 
         foreach ($this->options as $key => $call) {
-            if (is_callable($call) && in_array($key, ['loader', 'enabled', 'headers'])) {
+            if (is_callable($call) && in_array($key, ['loader', 'enabled', 'headers', 'seed'])) {
                 $this->options[$key] = $call();
             }
         }
@@ -124,6 +125,13 @@ final class SecurityHeaders
             $this->cspBuilder = CSPBuilder::fromArray($data);
         } else {
             $this->cspBuilder = new CSPBuilder();
+        }
+
+        // add nonce for self
+        if ($self = $this->option('seed')) {
+            $nonce = $this->getNonce((string) $self);
+            $this->cspBuilder->nonce('script-src', $nonce);
+            $this->cspBuilder->nonce('style-src', $nonce);
         }
 
         // add panel nonces
