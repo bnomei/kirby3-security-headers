@@ -129,7 +129,7 @@ final class SecurityHeaders
 
         // add nonce for self
         if ($self = $this->option('seed')) {
-            $nonce = $this->getNonce((string) $self);
+            $nonce = $this->setNonce((string) $self);
             $this->cspBuilder->nonce('script-src', $nonce);
             $this->cspBuilder->nonce('style-src', $nonce);
         }
