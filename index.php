@@ -69,4 +69,18 @@ Kirby::plugin('bnomei/securityheaders', [
             );
         },
     ],
+    'siteMethods' => [
+        'nonce' => function (): string {
+            return \Bnomei\SecurityHeaders::singleton()->getNonce(site()->url());
+        },
+        'nonceAttr' => function (): string {
+            return implode(
+                [
+                    'nonce="',
+                    \Bnomei\SecurityHeaders::singleton()->getNonce(site()->url()),
+                    '"',
+                ]
+            );
+        },
+    ],
 ]);

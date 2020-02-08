@@ -124,15 +124,21 @@ return [
 
 ## Panel and Frontend Nonces
 
-This plugin automatically registers Kirbys nonce for the panel. For convenience it also provides you with a single *frontend nonce* to use as attribute in `<link>`, `<style>` and `<script>` elements.
+This plugin automatically registers Kirbys nonce for the panel. For convenience it also provides you with a single *frontend nonce* to use as attribute in `<link>`, `<style>` and `<script>` elements. You can retrieve the nonce with `site()->nonce()` and the full attribute with `site()->nonceAttr()`.
 
 ```php
-<script <?= $page->nonceAttr(site()->url()) ?>>
+<?php ?>
+
+<script nonce="<?= site()->nonce() ?>">
 // ...
 </script>
+
+<style <?= site()->nonceAttr() ?>>
+
+</style>
 ```
 
-> TIP: The [srcset plugin](https://github.com/bnomei/kirby3-srcset/) uses that frontend nonce as well.
+> TIP: The [srcset plugin](https://github.com/bnomei/kirby3-srcset/) uses that *frontend nonce* as well.
 
 ## Settings
 
