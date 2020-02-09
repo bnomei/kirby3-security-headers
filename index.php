@@ -6,7 +6,7 @@ Kirby::plugin('bnomei/securityheaders', [
     'options' => [
         'enabled' => true,
         'seed' => function () {
-            return site()->url();
+            return Url::stripPath(site()->url());
         },
         'headers' => [
             "X-Powered-By" => "", // unset
@@ -71,13 +71,13 @@ Kirby::plugin('bnomei/securityheaders', [
     ],
     'siteMethods' => [
         'nonce' => function (): ?string {
-            return \Bnomei\SecurityHeaders::singleton()->getNonce(site()->url());
+            return \Bnomei\SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url()));
         },
         'nonceAttr' => function (): string {
             return implode(
                 [
                     'nonce="',
-                    \Bnomei\SecurityHeaders::singleton()->getNonce(site()->url()),
+                    \Bnomei\SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url())),
                     '"',
                 ]
             );
