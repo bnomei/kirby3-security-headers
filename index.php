@@ -70,7 +70,7 @@ Kirby::plugin('bnomei/securityheaders', [
         },
     ],
     'siteMethods' => [
-        'nonce' => function (): string {
+        'nonce' => function (): ?string {
             return \Bnomei\SecurityHeaders::singleton()->getNonce(site()->url());
         },
         'nonceAttr' => function (): string {
