@@ -6,10 +6,6 @@
   "default-src": {
     "self": true
   },
-  "child-src": {
-    "allow": [],
-    "self": false
-  },
   "connect-src": {
     "self": true
   },
@@ -21,6 +17,10 @@
     "self": true
   },
   "frame-ancestors": [],
+  "frame-src": {
+    "allow": [],
+    "self": false
+  },
   "img-src": {
     "self": true,
     "data": true
@@ -38,5 +38,9 @@
   "style-src": {
     "self": true
   },
-  "upgrade-insecure-requests": true
+  "upgrade-insecure-requests": true,
+  "worker-src": {
+    "allow": [],
+    "self": false
+  }
 }
