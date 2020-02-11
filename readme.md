@@ -103,6 +103,7 @@ The Setter is applied after the Loader. Use it to add dynamic stuff like hashes 
 return [
     'bnomei.securityheaders.setter' => function (\Bnomei\SecurityHeaders $instance) {
         // https://github.com/paragonie/csp-builder#build-a-content-security-policy-programmatically
+        /** @var ParagonIE\CSPBuilder\CSPBuilder $csp */
         /*
             $csp = $instance->csp();
             $nonce = $instance->setNonce('my-inline-script');
