@@ -10,7 +10,7 @@ Kirby::plugin('bnomei/securityheaders', [
         },
         'headers' => [
             "X-Powered-By" => "", // unset
-            "X-Frame-Options" => "SAMEORIGIN",
+            "X-Frame-Options" => "DENY",
             "X-XSS-Protection" => "1; mode=block",
             "X-Content-Type-Options" => "nosniff",
             "strict-transport-security" => "max-age=31536000; includeSubdomains; preload",
