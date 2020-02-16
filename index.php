@@ -13,7 +13,7 @@ Kirby::plugin('bnomei/securityheaders', [
             "X-Frame-Options" => "SAMEORIGIN",
             "X-XSS-Protection" => "1; mode=block",
             "X-Content-Type-Options" => "nosniff",
-            "strict-transport-security" => "max-age=31536000; includeSubdomains",
+            "strict-transport-security" => "max-age=31536000; includeSubdomains; preload",
             "Referrer-Policy" => "no-referrer-when-downgrade",
         ],
         'loader' => function () {
