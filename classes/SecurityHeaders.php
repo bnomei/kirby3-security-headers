@@ -171,6 +171,7 @@ final class SecurityHeaders
         // from config
         $headers = $this->option('headers');
         foreach ($headers as $key => $value) {
+            $value = is_array($value) ? implode('; ', $value) : $value;
             header($key . ': ' . $value);
         }
 
