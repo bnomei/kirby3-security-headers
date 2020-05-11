@@ -141,7 +141,7 @@ This plugin automatically registers Kirbys nonce for the panel. For convenience 
 
 | bnomei.securityheaders.   | Default        | Description               |            
 |---------------------------|----------------|---------------------------|
-| enabled | `true|false|'force'` | will set headers |
+| enabled | `true or false or 'force'` | will set headers |
 | seed | `callback` | returns a seed for frontend nonce |
 | headers | `array` | of sensible default values. modify as needed. |
 | loader | `callback` | returning filepath or array |
