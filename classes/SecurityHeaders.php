@@ -164,7 +164,11 @@ final class SecurityHeaders
      */
     public function sendHeaders(): bool
     {
-        if ($this->option('debug') || $this->option('enabled') !== true) {
+        if ($this->option('enabled') === false) {
+            return false;
+        }
+
+        if ($this->option('debug') && $this->option('enabled') !== 'force') {
             return false;
         }
 

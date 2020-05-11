@@ -120,6 +120,20 @@ final class SecurityheadersTest extends TestCase
         $this->assertFalse($sec->sendHeaders());
     }
 
+    public function testForceEnabled()
+    {
+        $sec = new Bnomei\SecurityHeaders([
+            'debug' => true,
+            'enabled' => 'force',
+            'headers' => [], // no default headers to test covage from sendCSPHeader
+        ]);
+        $sec->load();
+        $this->expectExceptionMessageRegExp(
+            '/^Headers already sent!*$/'
+        );
+        $this->assertFalse($sec->sendHeaders());
+    }
+
     public function testSendHeadersCSPOnly()
     {
         $sec = new Bnomei\SecurityHeaders([
