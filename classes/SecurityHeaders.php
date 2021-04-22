@@ -33,12 +33,16 @@ final class SecurityHeaders
     {
         $isPanel = strpos(
                 kirby()->request()->url()->toString(),
-                kirby()->urls()->panel
+                kirby()->urls()->panel()
+            ) !== false;
+        $isApi = strpos(
+                kirby()->request()->url()->toString(),
+                kirby()->urls()->panel()
             ) !== false;
         $panelHasNonces =  method_exists(kirby(), 'nonce');
 
         $enabled = !kirby()->system()->isLocal();
-        if ($isPanel && !$panelHasNonces) {
+        if ($isPanel || $isApi) {
             $enabled = false;
         }
 
