@@ -4,7 +4,7 @@
 
 Kirby::plugin('bnomei/securityheaders', [
     'options' => [
-        'enabled' => true,
+        'enabled' => null, // null => disable in panel and api
         'seed' => function () {
             return Url::stripPath(site()->url());
         },

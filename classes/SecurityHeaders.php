@@ -37,7 +37,7 @@ final class SecurityHeaders
             ) !== false;
         $isApi = strpos(
                 kirby()->request()->url()->toString(),
-                kirby()->urls()->panel()
+                kirby()->urls()->api()
             ) !== false;
         $panelHasNonces =  method_exists(kirby(), 'nonce');
 
