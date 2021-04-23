@@ -86,7 +86,7 @@ Kirby::plugin('bnomei/securityheaders', [
         },
     ],
     'pageMethods' => [
-        'nonce' => function (string $key): string {
+        'nonce' => function (string $key): ?string {
             return \Bnomei\SecurityHeaders::singleton()->getNonce($key);
         },
         'nonceAttr' => function (string $key): string {
