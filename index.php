@@ -15,6 +15,7 @@ Kirby::plugin('bnomei/securityheaders', [
             "X-Content-Type-Options" => "nosniff",
             "strict-transport-security" => "max-age=31536000; includeSubdomains; preload",
             "Referrer-Policy" => "no-referrer-when-downgrade",
+            "Permissions-Policy" => 'interest-cohort=()', // flock-off
             // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Feature-Policy
             "Feature-Policy" => [
                 "accelerometer 'none'",
