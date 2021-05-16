@@ -32,13 +32,13 @@ final class SecurityHeaders
     public function __construct(array $options = [])
     {
         $isPanel = strpos(
-                kirby()->request()->url()->toString(),
-                kirby()->urls()->panel()
-            ) !== false;
+            kirby()->request()->url()->toString(),
+            kirby()->urls()->panel()
+        ) !== false;
         $isApi = strpos(
-                kirby()->request()->url()->toString(),
-                kirby()->urls()->api()
-            ) !== false;
+            kirby()->request()->url()->toString(),
+            kirby()->urls()->api()
+        ) !== false;
         $panelHasNonces =  method_exists(kirby(), 'nonce');
 
         $enabled = !kirby()->system()->isLocal();

@@ -23,7 +23,7 @@ final class SecurityheadersTest extends TestCase
         $this->apachePath = __DIR__ . '/apache.cache';
         $this->nginxPath = __DIR__ . '/nginx.cache';
 
-        if(F::exists($this->jsonPath) && !F::exists($this->yamlPath)) {
+        if (F::exists($this->jsonPath) && !F::exists($this->yamlPath)) {
             $json = Json::decode(F::read($this->jsonPath));
             F::write($this->yamlPath, Yaml::encode($json));
         }
@@ -54,7 +54,9 @@ final class SecurityheadersTest extends TestCase
 
         $sec = new Bnomei\SecurityHeaders([
             'debug' => true,
-            'enabled' => function() { return false; }
+            'enabled' => function () {
+                return false;
+            }
         ]);
         $this->assertTrue($sec->option('debug'));
         $this->assertFalse($sec->option('enabled'));
@@ -128,7 +130,7 @@ final class SecurityheadersTest extends TestCase
             'headers' => [], // no default headers to test covage from sendCSPHeader
         ]);
         $sec->load();
-        $this->expectExceptionMessageRegExp(
+        $this->expectExceptionMessageMatches(
             '/^Headers already sent!*$/'
         );
         $this->assertFalse($sec->sendHeaders());
@@ -141,7 +143,7 @@ final class SecurityheadersTest extends TestCase
             'headers' => [], // no default headers to test covage from sendCSPHeader
         ]);
         $sec->load();
-        $this->expectExceptionMessageRegExp(
+        $this->expectExceptionMessageMatches(
             '/^Headers already sent!*$/'
         );
         $this->assertFalse($sec->sendHeaders());
@@ -153,7 +155,7 @@ final class SecurityheadersTest extends TestCase
             'enabled' => true, // force against localhost check
         ]);
         $sec->load();
-        $this->expectExceptionMessageRegExp(
+        $this->expectExceptionMessageMatches(
             '/^Cannot modify header information - headers already sent by.*$/'
         );
         $this->assertTrue($sec->sendHeaders());
@@ -163,7 +165,7 @@ final class SecurityheadersTest extends TestCase
     {
         $sec = new Bnomei\SecurityHeaders();
         $n = $sec->setNonce('test');
-        $this->assertRegExp('/^(.){54}==$/', $n);
+        $this->assertMatchesRegularExpression('/^(.){54}==$/', $n);
         $this->assertEquals($n, $sec->getNonce('test'));
     }
 }
