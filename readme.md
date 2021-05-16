@@ -56,7 +56,8 @@ return [
         "X-Content-Type-Options" => "nosniff",
         "strict-transport-security" => "max-age=31536000; includeSubdomains",
         "Referrer-Policy" => "no-referrer-when-downgrade",
-    ],
+        "Permissions-Policy" => 'interest-cohort=()', // flock-off,
+        // ... FEATURE POLICIES
     // other options...
 ];
 ```
