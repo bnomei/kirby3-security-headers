@@ -18,7 +18,7 @@ Kirby 3 Plugin for easier Security Headers setup.
 1. [Frontend Nonce](https://github.com/bnomei/kirby3-security-headers#frontend-nonce)
 1. [Settings](https://github.com/bnomei/kirby3-security-headers#settings)
 
-## Commerical Usage
+## Commercial Usage
 
 > <br>
 > <b>Support open source!</b><br><br>
