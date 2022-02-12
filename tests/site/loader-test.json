@@ -1,0 +1,45 @@
+{
+  "report-only": false,
+  "report-to": "PolicyName",
+  "report-uri": "/csp_violation_reporting_endpoint",
+  "base-uri": [],
+  "default-src": [],
+  "child-src": {
+    "allow": [
+      "https://www.youtube.com",
+      "https://www.youtube-nocookie.com"
+    ],
+    "self": false
+  },
+  "connect-src": [],
+  "font-src": {
+    "self": true
+  },
+  "form-action": {
+    "allow": [
+      "https://example.com"
+    ],
+    "self": true
+  },
+  "frame-ancestors": [],
+  "img-src": {
+    "blob": true,
+    "self": true,
+    "data": true
+  },
+  "media-src": [],
+  "object-src": [],
+  "plugin-types": [],
+  "script-src": {
+    "allow": [
+      "https://www.google-analytics.com"
+    ],
+    "self": true,
+    "unsafe-inline": false,
+    "unsafe-eval": false
+  },
+  "style-src": {
+    "self": true
+  },
+  "upgrade-insecure-requests": true
+}

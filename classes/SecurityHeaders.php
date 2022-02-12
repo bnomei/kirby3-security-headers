@@ -7,8 +7,8 @@ namespace Bnomei;
 use Kirby\Data\Json;
 use Kirby\Data\Yaml;
 use Kirby\Toolkit\A;
-use Kirby\Toolkit\F;
-use Kirby\Toolkit\Mime;
+use Kirby\Filesystem\F;
+use Kirby\Filesystem\Mime;
 use ParagonIE\CSPBuilder\CSPBuilder;
 use function header;
 
@@ -48,12 +48,12 @@ final class SecurityHeaders
 
         $defaults = [
             'debug' => option('debug'),
-            'loader' => option('bnomei.securityheaders.loader'),
             'enabled' => option('bnomei.securityheaders.enabled', $enabled),
             'headers' => option('bnomei.securityheaders.headers'),
             'seed' => option('bnomei.securityheaders.seed'),
             'panel' => $isPanel,
             'panelnonces' => $panelHasNonces ? ['panel' => kirby()->nonce()] : [],
+            'loader' => option('bnomei.securityheaders.loader'),
             'setter' => option('bnomei.securityheaders.setter'),
         ];
         $this->options = array_merge($defaults, $options);

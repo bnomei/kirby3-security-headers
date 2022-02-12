@@ -188,6 +188,12 @@ class CSPBuilder
             case 'scripts':
                 $directive = 'script-src';
                 break;
+            case 'script-src-elem':
+                $directive = 'script-src-elem';
+                break;
+            case 'script-src-attr':
+                $directive = 'script-src-attr';
+                break;
             case 'style':
             case 'css':
             case 'css-src':
@@ -197,7 +203,15 @@ class CSPBuilder
                 $directive = 'worker-src';
                 break;
         }
-        $this->policies[$directive]['allow'][] = $path;
+        if (!isset($this->policies[$directive])) {
+            $this->policies[$directive] = [];
+        }
+        if (!isset($this->policies[$directive]['allow'])) {
+            $this->policies[$directive]['allow'] = [];
+        }
+        if (!in_array($path, $this->policies[$directive]['allow'], true)) {
+            $this->policies[$directive]['allow'][] = $path;
+        }
         return $this;
     }
 
@@ -277,7 +291,7 @@ class CSPBuilder
     }
 
     /**
-     * Factory method - create a new CSPBuilder object from a JSON data
+     * Factory method - create a new CSPBuilder object from JSON data
      *
      * @param string $data
      * @return self
@@ -475,7 +489,8 @@ class CSPBuilder
      */
     public function saveSnippet(
         string $outputFile,
-        string $format = self::FORMAT_NGINX
+        string $format = self::FORMAT_NGINX,
+        callable $hookBeforeSave = null
     ): bool {
         if ($this->needsCompile) {
             $this->compile();
@@ -511,6 +526,11 @@ class CSPBuilder
             default:
                 throw new \Exception('Unknown format: '.$format);
         }
+
+        if ($hookBeforeSave !== null) {
+            $output = $hookBeforeSave($output);
+        }
+
         return \file_put_contents($outputFile, $output) !== false;
     }
 
@@ -676,6 +696,23 @@ class CSPBuilder
     }
 
     /**
+     * Allow/disallow loading resources only over HTTPS on any domain for a given directive
+     *
+     * @param string $directive
+     * @param bool $allow
+     * @return self
+     * @throws \Exception
+     */
+    public function setHttpsAllowed(string $directive = '', bool $allow = false): self
+    {
+        if (!\in_array($directive, self::$directives)) {
+            throw new \Exception('Directive ' . $directive . ' does not exist');
+        }
+        $this->policies[$directive]['https'] = $allow;
+        return $this;
+    }
+
+    /**
      * Allow/disallow self URIs for a given directive
      *
      * @param string $directive
@@ -730,6 +767,21 @@ class CSPBuilder
     public function setStrictDynamic(string $directive = '', bool $allow = false): self
     {
         $this->policies[$directive]['strict-dynamic'] = $allow;
+        return $this;
+    }
+
+    /**
+     * Set report-sample for a given directive.
+     *
+     * @param string $directive
+     * @param bool $allow
+     *
+     * @return self
+     * @throws \Exception
+     */
+    public function setReportSample(string $directive = '', bool $allow = false): self
+    {
+        $this->policies[$directive]['report-sample'] = $allow;
         return $this;
     }
 
@@ -879,8 +931,14 @@ class CSPBuilder
         if (!empty($policies['filesystem'])) {
             $ret .= "filesystem: ";
         }
+        if (!empty($policies['https'])) {
+            $ret .= "https: ";
+        }
         if (!empty($policies['strict-dynamic'])) {
             $ret .= "'strict-dynamic' ";
+        }
+        if (!empty($policies['report-sample'])) {
+            $ret .= "'report-sample' ";
         }
         if (!empty($policies['unsafe-hashed-attributes'])) {
             $ret .= "'unsafe-hashed-attributes' ";
@@ -954,5 +1012,32 @@ class CSPBuilder
         $this->httpsTransformOnHttpsConnections = true;
 
         return $this;
+    }
+
+    /**
+     * Export the policies object as a JSON string
+     *
+     * @return string
+     */
+    public function exportPolicies(): string
+    {
+        return json_encode($this->policies, JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * Save the configured policies to a JSON file.
+     *
+     * @param string $filePath
+     * @return bool
+     */
+    public function saveToFile(string $filePath): bool
+    {
+        if (!is_writable($filePath)) {
+            throw new \RuntimeException('Cannot write to ' . $filePath);
+        }
+        return file_put_contents(
+            $filePath,
+            $this->exportPolicies()
+        ) !== false;
     }
 }

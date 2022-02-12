@@ -4,11 +4,12 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit8e11c319fcee8e4145808a6f30842e69
+class ComposerStaticInitd33dc07cfed3d5f9828c77e6ab87144a
 {
     public static $prefixLengthsPsr4 = array (
         'P' => 
         array (
+            'Psr\\Http\\Message\\' => 17,
             'ParagonIE\\ConstantTime\\' => 23,
             'ParagonIE\\CSPBuilder\\' => 21,
         ),
@@ -23,6 +24,10 @@ class ComposerStaticInit8e11c319fcee8e4145808a6f30842e69
     );
 
     public static $prefixDirsPsr4 = array (
+        'Psr\\Http\\Message\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/psr/http-message/src',
+        ),
         'ParagonIE\\ConstantTime\\' => 
         array (
             0 => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src',
@@ -60,14 +65,21 @@ class ComposerStaticInit8e11c319fcee8e4145808a6f30842e69
         'ParagonIE\\ConstantTime\\Encoding' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Encoding.php',
         'ParagonIE\\ConstantTime\\Hex' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/Hex.php',
         'ParagonIE\\ConstantTime\\RFC4648' => __DIR__ . '/..' . '/paragonie/constant_time_encoding/src/RFC4648.php',
+        'Psr\\Http\\Message\\MessageInterface' => __DIR__ . '/..' . '/psr/http-message/src/MessageInterface.php',
+        'Psr\\Http\\Message\\RequestInterface' => __DIR__ . '/..' . '/psr/http-message/src/RequestInterface.php',
+        'Psr\\Http\\Message\\ResponseInterface' => __DIR__ . '/..' . '/psr/http-message/src/ResponseInterface.php',
+        'Psr\\Http\\Message\\ServerRequestInterface' => __DIR__ . '/..' . '/psr/http-message/src/ServerRequestInterface.php',
+        'Psr\\Http\\Message\\StreamInterface' => __DIR__ . '/..' . '/psr/http-message/src/StreamInterface.php',
+        'Psr\\Http\\Message\\UploadedFileInterface' => __DIR__ . '/..' . '/psr/http-message/src/UploadedFileInterface.php',
+        'Psr\\Http\\Message\\UriInterface' => __DIR__ . '/..' . '/psr/http-message/src/UriInterface.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit8e11c319fcee8e4145808a6f30842e69::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit8e11c319fcee8e4145808a6f30842e69::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit8e11c319fcee8e4145808a6f30842e69::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitd33dc07cfed3d5f9828c77e6ab87144a::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitd33dc07cfed3d5f9828c77e6ab87144a::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitd33dc07cfed3d5f9828c77e6ab87144a::$classMap;
 
         }, null, ClassLoader::class);
     }

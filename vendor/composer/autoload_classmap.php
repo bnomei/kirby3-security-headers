@@ -24,4 +24,11 @@ return array(
     'ParagonIE\\ConstantTime\\Encoding' => $vendorDir . '/paragonie/constant_time_encoding/src/Encoding.php',
     'ParagonIE\\ConstantTime\\Hex' => $vendorDir . '/paragonie/constant_time_encoding/src/Hex.php',
     'ParagonIE\\ConstantTime\\RFC4648' => $vendorDir . '/paragonie/constant_time_encoding/src/RFC4648.php',
+    'Psr\\Http\\Message\\MessageInterface' => $vendorDir . '/psr/http-message/src/MessageInterface.php',
+    'Psr\\Http\\Message\\RequestInterface' => $vendorDir . '/psr/http-message/src/RequestInterface.php',
+    'Psr\\Http\\Message\\ResponseInterface' => $vendorDir . '/psr/http-message/src/ResponseInterface.php',
+    'Psr\\Http\\Message\\ServerRequestInterface' => $vendorDir . '/psr/http-message/src/ServerRequestInterface.php',
+    'Psr\\Http\\Message\\StreamInterface' => $vendorDir . '/psr/http-message/src/StreamInterface.php',
+    'Psr\\Http\\Message\\UploadedFileInterface' => $vendorDir . '/psr/http-message/src/UploadedFileInterface.php',
+    'Psr\\Http\\Message\\UriInterface' => $vendorDir . '/psr/http-message/src/UriInterface.php',
 );

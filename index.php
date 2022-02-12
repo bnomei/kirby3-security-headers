@@ -1,5 +1,7 @@
 <?php
 
+use Bnomei\SecurityHeaders;
+
 @include_once __DIR__ . '/vendor/autoload.php';
 
 Kirby::plugin('bnomei/securityheaders', [
@@ -63,7 +65,7 @@ Kirby::plugin('bnomei/securityheaders', [
             // otherwise forward the default file from this plugin
             return __DIR__ . '/loader.json';
         },
-        'setter' => function (\Bnomei\SecurityHeaders $instance): void {
+        'setter' => function (SecurityHeaders $instance): void {
             // https://github.com/paragonie/csp-builder#build-a-content-security-policy-programmatically
             /*
                 $csp = $instance->csp();
@@ -81,20 +83,18 @@ Kirby::plugin('bnomei/securityheaders', [
     ],
     'hooks' => [
         'route:before' => function (): void {
-            if (option('bnomei.securityheaders.enabled')) {
-                \Bnomei\SecurityHeaders::singleton()->sendHeaders();
-            }
+            SecurityHeaders::singleton()->sendHeaders();
         },
     ],
     'pageMethods' => [
         'nonce' => function (string $key): ?string {
-            return \Bnomei\SecurityHeaders::singleton()->getNonce($key);
+            return SecurityHeaders::singleton()->getNonce($key);
         },
         'nonceAttr' => function (string $key): string {
             return implode(
                 [
                     'nonce="',
-                    \Bnomei\SecurityHeaders::singleton()->getNonce($key),
+                    SecurityHeaders::singleton()->getNonce($key),
                     '"',
                 ]
             );
@@ -102,13 +102,13 @@ Kirby::plugin('bnomei/securityheaders', [
     ],
     'siteMethods' => [
         'nonce' => function (): ?string {
-            return \Bnomei\SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url()));
+            return SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url()));
         },
         'nonceAttr' => function (): string {
             return implode(
                 [
                     'nonce="',
-                    \Bnomei\SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url())),
+                    SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url())),
                     '"',
                 ]
             );
