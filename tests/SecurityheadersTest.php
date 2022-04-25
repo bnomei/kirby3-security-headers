@@ -50,7 +50,7 @@ final class SecurityheadersTest extends TestCase
         $this->assertIsArray($sec->option());
         $this->assertCount(8, $sec->option());
 
-        $this->assertNull($sec->option('debug'));
+        $this->assertTrue($sec->option('debug')); // config "force"
 
         $sec = new Bnomei\SecurityHeaders([
             'debug' => true,
@@ -139,7 +139,7 @@ final class SecurityheadersTest extends TestCase
     public function testSendHeadersCSPOnly()
     {
         $sec = new Bnomei\SecurityHeaders([
-            'enabled' => true, // force against localhost check
+            'enabled' => 'force', // force against localhost check
             'headers' => [], // no default headers to test covage from sendCSPHeader
         ]);
         $sec->load();
@@ -152,7 +152,7 @@ final class SecurityheadersTest extends TestCase
     public function testSendHeadersFull()
     {
         $sec = new Bnomei\SecurityHeaders([
-            'enabled' => true, // force against localhost check
+            'enabled' => 'force', // force against localhost check
         ]);
         $sec->load();
         $this->expectExceptionMessageMatches(
