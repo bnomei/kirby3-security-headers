@@ -1,7 +1,7 @@
 {
   "name": "bnomei/kirby3-security-headers",
   "type": "kirby-plugin",
-  "version": "2.5.4",
+  "version": "2.5.5",
   "license": "MIT",
   "description": "Kirby 3 Plugin for easier Security Headers setup",
   "authors": [
@@ -38,7 +38,7 @@
     }
   },
   "require": {
-    "php": ">=7.4.0",
+    "php": ">=8.0.0",
     "getkirby/composer-installer": "^1.2",
     "paragonie/csp-builder": "^2.5"
   },
