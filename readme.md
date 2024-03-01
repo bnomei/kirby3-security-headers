@@ -1,4 +1,4 @@
-# Kirby 3 Content Security Policy Header
+# Kirby Content Security Policy Header
 
 ![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-security-headers?color=ae81ff)
 ![Downloads](https://flat.badgen.net/packagist/dt/bnomei/kirby3-security-headers?color=272822)
@@ -7,7 +7,7 @@
 [![Maintainability](https://flat.badgen.net/codeclimate/maintainability/bnomei/kirby3-security-headers)](https://codeclimate.com/github/bnomei/kirby3-security-headers)  
 [![Twitter](https://flat.badgen.net/badge/twitter/bnomei?color=66d9ef)](https://twitter.com/bnomei)
 
-Kirby 3 Plugin for easier Security Headers setup.
+Kirby Plugin for easier Security Headers setup.
 
 > 🔐 Why should you use this plugin? Because security matters. Protecting your own or your clients websites and their customers data is important.
 

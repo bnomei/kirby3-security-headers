@@ -19,7 +19,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.0'
+          php-version: '8.1'
           tools: composer
 
       - name: Install
@@ -28,7 +28,7 @@ jobs:
       # update kirby to latest release of version 3 (includes release candidates!)
       # https://semver.mwl.be/#!?package=getkirby%2Fcms&version=3.*&minimum-stability=RC
       - name: Update Kirby Core
-        run: composer require getkirby/cms:"3.*@RC"
+        run: composer require getkirby/cms:"4.*@RC"
 
       - name: Run Tests
         run: composer test

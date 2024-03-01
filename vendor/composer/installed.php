@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'bnomei/kirby3-security-headers',
-        'pretty_version' => '2.5.5',
-        'version' => '2.5.5.0',
-        'reference' => NULL,
+        'pretty_version' => '4.0.0',
+        'version' => '4.0.0.0',
+        'reference' => null,
         'type' => 'kirby-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'bnomei/kirby3-security-headers' => array(
-            'pretty_version' => '2.5.5',
-            'version' => '2.5.5.0',
-            'reference' => NULL,
+            'pretty_version' => '4.0.0',
+            'version' => '4.0.0.0',
+            'reference' => null,
             'type' => 'kirby-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

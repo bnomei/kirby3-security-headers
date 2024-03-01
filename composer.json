@@ -1,9 +1,9 @@
 {
   "name": "bnomei/kirby3-security-headers",
   "type": "kirby-plugin",
-  "version": "2.5.5",
+  "version": "4.0.0",
   "license": "MIT",
-  "description": "Kirby 3 Plugin for easier Security Headers setup",
+  "description": "Kirby Plugin for easier Security Headers setup",
   "authors": [
     {
       "name": "Bruno Meilick",
@@ -11,9 +11,9 @@
     }
   ],
   "keywords": [
-    "kirby3",
-    "kirby3-cms",
-    "kirby3-plugin",
+    "kirby",
+    "kirby-cms",
+    "kirby-plugin",
     "content-security-policy",
     "security-headers",
     "csp",
@@ -38,12 +38,12 @@
     }
   },
   "require": {
-    "php": ">=8.0.0",
+    "php": ">=8.1.0",
     "getkirby/composer-installer": "^1.2",
     "paragonie/csp-builder": "^2.5"
   },
   "require-dev": {
-    "getkirby/cms": "^3.5",
+    "getkirby/cms": "^4.0",
     "php-coveralls/php-coveralls": "^2.1",
     "phpunit/phpunit": "^9.5"
   },
