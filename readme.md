@@ -18,20 +18,6 @@ Kirby Plugin for easier Security Headers setup.
 1. [Frontend Nonce](https://github.com/bnomei/kirby3-security-headers#frontend-nonce)
 1. [Settings](https://github.com/bnomei/kirby3-security-headers#settings)
 
-## Commercial Usage
-
-> <br>
-> <b>Support open source!</b><br><br>
-> This plugin is free but if you use it in a commercial project please consider to sponsor me or make a donation.<br>
-> If my work helped you to make some cash it seems fair to me that I might get a little reward as well, right?<br><br>
-> Be kind. Share a little. Thanks.<br><br>
-> &dash; Bruno<br>
-> &nbsp; 
-
-| M | O | N | E | Y |
-|---|----|---|---|---|
-| [Github sponsor](https://github.com/sponsors/bnomei) | [Patreon](https://patreon.com/bnomei) | [Buy Me a Coffee](https://buymeacoff.ee/bnomei) | [Paypal dontation](https://www.paypal.me/bnomei/15) | [Hire me](mailto:b@bnomei.com?subject=Kirby) |
-
 ## Installation
 
 - unzip [master.zip](https://github.com/bnomei/kirby3-security-headers/archive/master.zip) as folder `site/plugins/kirby3-security-headers` or
@@ -50,7 +36,7 @@ A `route:before`-hook takes care of setting the headers automatically unless one
 
 ### Header
 
-The following headers will be applied by default. You can override them in the config file.
+The following headers will be applied by default, you do not need to set them explicitly. You can override them in the config file.
 
 **/site/config/config.php**
 ```php
