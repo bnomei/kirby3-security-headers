@@ -1,156 +1,170 @@
 # Kirby Content Security Policy Header
 
-![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-security-headers?color=ae81ff)
-![Downloads](https://flat.badgen.net/packagist/dt/bnomei/kirby3-security-headers?color=272822)
-[![Build Status](https://flat.badgen.net/travis/bnomei/kirby3-security-headers)](https://travis-ci.com/bnomei/kirby3-security-headers)
-[![Coverage Status](https://flat.badgen.net/coveralls/c/github/bnomei/kirby3-security-headers)](https://coveralls.io/github/bnomei/kirby3-security-headers) 
-[![Maintainability](https://flat.badgen.net/codeclimate/maintainability/bnomei/kirby3-security-headers)](https://codeclimate.com/github/bnomei/kirby3-security-headers)  
-[![Twitter](https://flat.badgen.net/badge/twitter/bnomei?color=66d9ef)](https://twitter.com/bnomei)
+[![Kirby 5](https://flat.badgen.net/badge/Kirby/5?color=ECC748)](https://getkirby.com)
+![PHP 8.2](https://flat.badgen.net/badge/PHP/8.2?color=4E5B93&icon=php&label)
+![Release](https://flat.badgen.net/packagist/v/bnomei/kirby3-security-headers?color=ae81ff&icon=github&label)
+![Downloads](https://flat.badgen.net/packagist/dt/bnomei/kirby3-security-headers?color=272822&icon=github&label)
+[![Coverage](https://flat.badgen.net/codeclimate/coverage/bnomei/kirby3-security-headers?icon=codeclimate&label)](https://codeclimate.com/github/bnomei/kirby3-security-headers)
+[![Maintainability](https://flat.badgen.net/codeclimate/maintainability/bnomei/kirby3-security-headers?icon=codeclimate&label)](https://codeclimate.com/github/bnomei/kirby3-security-headers/issues)
+[![Discord](https://flat.badgen.net/badge/discord/bnomei?color=7289da&icon=discord&label)](https://discordapp.com/users/bnomei)
+[![Buymecoffee](https://flat.badgen.net/badge/icon/donate?icon=buymeacoffee&color=FF813F&label)](https://www.buymeacoffee.com/bnomei)
 
-Kirby Plugin for easier Security Headers setup.
-
-> 🔐 Why should you use this plugin? Because security matters. Protecting your own or your clients websites and their customers data is important.
-
-1. [Automatic Setup](https://github.com/bnomei/kirby3-security-headers#automatic)
-1. [Setup: Headers](https://github.com/bnomei/kirby3-security-headers#headers)
-1. [Setup: Loader](https://github.com/bnomei/kirby3-security-headers#loader)
-1. [Setup: Setter](https://github.com/bnomei/kirby3-security-headers#setter)
-1. [Frontend Nonce](https://github.com/bnomei/kirby3-security-headers#frontend-nonce)
-1. [Settings](https://github.com/bnomei/kirby3-security-headers#settings)
+Kirby Plugin for easier Content Security Policy (CSP) Headers setup.
 
 ## Installation
 
-- unzip [master.zip](https://github.com/bnomei/kirby3-security-headers/archive/master.zip) as folder `site/plugins/kirby3-security-headers` or
+- unzip [master.zip](https://github.com/bnomei/kirby3-security-headers/archive/master.zip) as folder
+  `site/plugins/kirby3-security-headers` or
 - `git submodule add https://github.com/bnomei/kirby3-security-headers.git site/plugins/kirby3-security-headers` or
 - `composer require bnomei/kirby3-security-headers`
 
-## Setup
+## Default CSP Headers
 
-### Automatic
+The following headers will be applied by default, you do not need to set them explicitly. They provide a good starting
+point for most websites and ensure a sane level of security.
 
-A `route:before`-hook takes care of setting the headers automatically unless one of the following conditions applies:
-
-- Kirbys **global** debug mode is `true`
-- Kirby determins it is a [local setup](https://github.com/getkirby/kirby/blob/03d6e96aa27f631e5311cb6c2109e1510505cab7/src/Cms/System.php#L190)
-- the plugins setting `enabled` is set to `false`
-
-### Header
-
-The following headers will be applied by default, you do not need to set them explicitly. You can override them in the config file.
-
-**/site/config/config.php**
-```php
-<?php
-return [
-    'bnomei.securityheaders.headers' => [
-        "X-Powered-By" => "", // unset
-        "X-Frame-Options" => "SAMEORIGIN",
-        "X-XSS-Protection" => "1; mode=block",
-        "X-Content-Type-Options" => "nosniff",
-        "strict-transport-security" => "max-age=31536000; includeSubdomains",
-        "Referrer-Policy" => "no-referrer-when-downgrade",
-        "Permissions-Policy" => 'interest-cohort=()', // flock-off,
-        // ... FEATURE POLICIES
-    // other options...
-];
+```yaml
+X-Powered-By:                 "" # unset
+X-Frame-Options:              "SAMEORIGIN"
+X-XSS-Protection:             "1; mode=block"
+X-Content-Type-Options:       "nosniff"
+Strict-Transport-Security:    "max-age=31536000; includeSubdomains"
+Referrer-Policy:              "no-referrer-when-downgrade"
+Permissions-Policy:           "interest-cohort=()" # flock-off
+# + various Feature-Policies...
 ```
+
+> [!TIP]
+> See `\Bnomei\SecurityHeaders::HEADERS_DEFAULT` for more details.
+
+## Zero Configuration? Almost.
+
+Installing the plugin is enough to protect your website. A `route:before`-hook takes care of sending the CSP headers
+automatically. But you will most likely need to customize the CSP headers when using third-party services like
+
+- Content Delivery Networks (CDN),
+- analytic scripts like Google-Tag-Manager/Fathom/Matomo/Piwik/Plausible/Umami,
+- embedding external media like from Youtube/Vimeo/Instagram/X,
+- external newsletter sign-up forms from Brevo/Mailchimp/Mailjet/Mailcoach,
+- any other third-party service not hosted on your domain or subdomain or
+- when using inline `<script>` and/or `<style>`.
+
+> [!TIP]
+> The plugin will automatically disable itself on local setups to not get in your way while developing. To test the CSP headers locally, you can use the `'bnomei.securityheaders.enable' => true,` option to enforce sending the headers.
+
+## Customizing CSP Headers & Nonces
+
+You can customize the CSP headers by providing a custom **Loader** and/or **Setter** via the Kirby config.
 
 ### Loader
 
-The Loader is used to initally create the CSPBuilder object with a given set of data. You skip that, forward a file to load, provide an array or [use the default loader file](https://github.com/bnomei/kirby3-security-headers/blob/master/loader.json). Using a custom file is recommended when for example adding additional font-src for google web fonts. 
+The Loader is used to initially create the CSP-Builder object with a given set of mostly static data. You can provide a
+path to a file, return an array or `null` to create blank CSP-Builder object.
 
-**/site/config/config.php**
-```php
-<?php
-return [
-    'bnomei.securityheaders.loader' => function () {
-        // https://github.com/paragonie/csp-builder#example
-        // null if you do NOT want to use default and/or just the setter
-        /*
-            return null;
-         */
-        // return path of file (json or yaml)
-        // or an array of options for the cspbuilder
-        /*
-            return [...];
-            return kirby()->roots()->site() . '/your-csp.json';
-            return kirby()->roots()->site() . '/your-csp.yml';
-        */
-        // otherwise forward the default file from this plugin
-        return __DIR__ . '/loader.json';
-    },
-    // other options...
-];
-```
+> [!TIP]
+> See `\Bnomei\SecurityHeaders::LOADER_DEFAULT` for more details.
+
+> [!WARNING]
+> Consider using a custom loader ONLY if you find yourself adding a lot of configurations in the Setter. The default
+> loader is already quite extensive and should cover most use-cases.
 
 ### Setter
 
-The Setter is applied after the Loader. Use it to add dynamic stuff like hashes and nonces. 
+The **Setter** is applied after the **Loader**. Use it to add dynamic stuff like rules for external services, hashes and
+nonces.
 
 **/site/config/config.php**
+
 ```php
 <?php
 return [
-    'bnomei.securityheaders.setter' => function (\Bnomei\SecurityHeaders $instance) {
-        // https://github.com/paragonie/csp-builder#build-a-content-security-policy-programmatically
+    'bnomei.securityheaders.setter' => function ($instance) {
+        // https://github.com/paragonie/csp-builder
+        // #build-a-content-security-policy-programmatically
         /** @var ParagonIE\CSPBuilder\CSPBuilder $csp */
-        /*
-            $csp = $instance->csp();
-            $nonce = $instance->setNonce('my-inline-script');
-            $csp->nonce('script-src', $nonce);
-        */
-        // in your template retrieve it again with
-        /*
-            $nonce = $page->nonce('my-inline-script');
-            => `THIS-IS-THE-NONCE`
-            $attr = $page->nonceAttr('my-inline-script');
-            => `nonce="THIS-IS-THE-NONCE"`
-        */
+        $csp = $instance->csp();
+        
+        // allowing all inline scripts and styles is
+        // not recommended, try using nonces instead
+        // $csp->setAllowUnsafeEval('script-src', true);
+        // $csp->setAllowUnsafeInline('script-src', true);
+        // $csp->setAllowUnsafeInline('style-src', true);
+        
+        // youtube
+        $csp->addSource('image', 'https://ytimg.com');
+        $csp->addSource('image', 'https://ggpht.com');
+        $csp->addSource('frame', 'https://youtube.com');
+        $csp->addSource('frame', 'https://www.youtube.com');
+        $csp->addSource('image', 'https://youtube.com');
+        $csp->addSource('script', 'https://youtube.com');
+        $csp->addSource('script', 'https://google.com');
+
+        // vimeo
+        $csp->addSource('image', 'i.vimeocdn.com');
+        $csp->addSource('script', 'f.vimeocdn.com');
+        $csp->addSource('style', 'f.vimeocdn.com');
+        $csp->addSource('frame', 'player.vimeo.com');
+        $csp->addSource('source', 'player.vimeo.com');
     },
     // other options...
 ];
 ```
 
-> TIP: nonces are set in the `setter` and later retrieved using `$page->nonce(...)` or `$page->nonceAttr(...)`.
+> [!TIP]
+> You can define nonces in the `Setter`-option and later retrieved using `$page->nonce(...)` or `$page->nonceAttr(...)`.
+> But the plugin also provides a single nonce for frontend use out of the box.
 
-## Panel and Frontend Nonces
+## Nonces
 
-This plugin automatically registers Kirbys nonce for the panel. For convenience it also provides you with a single *frontend nonce* to use as attribute in `<link>`, `<style>` and `<script>` elements. You can retrieve the nonce with `site()->nonce()` and the full attribute with `site()->nonceAttr()`.
+For convenience the plugin also provides you with a single
+*frontend nonce* to use as attribute in `<link>`, `<style>` and `<script>` elements. You can retrieve the nonce with
+`site()->nonce()`.
 
 ```php
-<?php ?>
-
 <script nonce="<?= site()->nonce() ?>">
-// ...
+/* ... */
 </script>
-
-<style <?= site()->nonceAttr() ?>>
-
-</style>
 ```
 
-> TIP: The [srcset plugin](https://github.com/bnomei/kirby3-srcset/) uses that *frontend nonce* as well.
+> [!NOTE]
+> This plugin automatically registers the nonce that Kirby creates for its panel (in case that ever might be needed).
+
+## Disabling the plugin
+
+The CSP headers will be sent before Kirby renders HTML using a `route:before` hook but the plugin will be automatically
+disabled if one the following conditions apply:
+
+- Kirby determines it is
+  a [local setup](https://github.com/getkirby/kirby/blob/03d6e96aa27f631e5311cb6c2109e1510505cab7/src/Cms/System.php#L190)
+  or
+- The plugins setting `bnomei.securityheaders.enabled` is set to `false`.
+
+> [!WARNING]
+> By default, CSP headers are never sent for any Kirby Panel, API and Media routes.
 
 ## Settings
 
-| bnomei.securityheaders.   | Default        | Description               |            
-|---------------------------|----------------|---------------------------|
-| enabled | `true or false or 'force'` | will set headers |
-| seed | `callback` | returns a seed for frontend nonce |
-| headers | `array` | of sensible default values. modify as needed. |
-| loader | `callback` | returning filepath or array |
-| setter | `callback` |  instance which allows customizing the CSPBuilder |
+| bnomei.securityheaders. | Default           | Description                                               |            
+|-------------------------|-------------------|-----------------------------------------------------------|
+| enabled                 | `null/true/false` | will set headers                                          |
+| seed                    | `callback`        | returns a unique seed for frontend nonces on every request |
+| headers                 | `callback`        | array of sensible default values                          |
+| loader                  | `callback`        | returning filepath or array                               |
+| setter                  | `callback`        | instance which allows customizing the CSPBuilder          |
 
 ## Dependencies
- 
- - [paragonie/csp-builder](https://github.com/paragonie/csp-builder)
+
+- [paragonie/csp-builder](https://github.com/paragonie/csp-builder)
 
 ## Disclaimer
 
-This plugin is provided "as is" with no guarantee. Use it at your own risk and always test it yourself before using it in a production environment. If you find any issues, please [create a new issue](https://github.com/bnomei/kirby3-security-headers/issues/new).
+This plugin is provided "as is" with no guarantee. Use it at your own risk and always test it yourself before using it
+in a production environment. If you find any issues,
+please [create a new issue](https://github.com/bnomei/kirby3-security-headers/issues/new).
 
 ## License
 
 [MIT](https://opensource.org/licenses/MIT)
 
-It is discouraged to use this plugin in any project that promotes racism, sexism, homophobia, animal abuse, violence or any other form of hate speech.
+It is discouraged to use this plugin in any project that promotes racism, sexism, homophobia, animal abuse, violence or
+any other form of hate speech.

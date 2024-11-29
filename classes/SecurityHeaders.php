@@ -4,113 +4,170 @@ declare(strict_types=1);
 
 namespace Bnomei;
 
+use Closure;
 use Kirby\Data\Json;
 use Kirby\Data\Yaml;
-use Kirby\Toolkit\A;
 use Kirby\Filesystem\F;
 use Kirby\Filesystem\Mime;
+use Kirby\Toolkit\A;
 use ParagonIE\CSPBuilder\CSPBuilder;
+
 use function header;
 
-final class SecurityHeaders
+class SecurityHeaders
 {
-    /*
-     * @var array
-     */
-    private $options;
+    const HEADERS_DEFAULT = [
+        'X-Powered-By' => '', // unset
+        'X-Frame-Options' => 'DENY',
+        'X-XSS-Protection' => '1; mode=block',
+        'X-Content-Type-Options' => 'nosniff',
+        'strict-transport-security' => 'max-age=31536000; includeSubdomains; preload',
+        'Referrer-Policy' => 'no-referrer-when-downgrade',
+        'Permissions-Policy' => 'interest-cohort=()', // flock-off
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Feature-Policy
+        'Feature-Policy' => [
+            "accelerometer 'none'",
+            "ambient-light-sensor 'none'",
+            "autoplay 'none'",
+            "battery 'none'",
+            "camera 'none'",
+            "display-capture 'none'",
+            "document-domain 'none'",
+            "encrypted-media 'none'",
+            "execution-while-not-rendered 'none'",
+            "execution-while-out-of-viewport 'none'",
+            "fullscreen 'none'",
+            "geolocation 'none'",
+            "gyroscope 'none'",
+            "layout-animations 'none'",
+            "legacy-image-formats 'none'",
+            "magnetometer 'none'",
+            "microphone 'none'",
+            "midi 'none'",
+            "navigation-override 'none'",
+            "oversized-images 'none'",
+            "payment 'none'",
+            "picture-in-picture 'none'",
+            "publickey-credentials 'none'",
+            "sync-xhr 'none'",
+            "usb 'none'",
+            "wake-lock 'none'",
+            "xr-spatial-tracking 'none'",
+        ],
+    ];
 
-    /*
-     * @var ParagonIE\CSPBuilder\CSPBuilder
-     */
-    private $cspBuilder;
+    const LOADER_DEFAULT = [
+        'report-only' => false,
+        'base-uri' => [
+            'self' => true,
+        ],
+        'default-src' => [
+            'self' => true,
+        ],
+        'connect-src' => [
+            'self' => true,
+        ],
+        'font-src' => [
+            'self' => true,
+        ],
+        'form-action' => [
+            'allow' => [],
+            'self' => true,
+        ],
+        'frame-ancestors' => [],
+        'frame-src' => [
+            'allow' => [],
+            'self' => false,
+        ],
+        'img-src' => [
+            'self' => true,
+            'data' => true,
+        ],
+        'media-src' => [],
+        'object-src' => [],
+        'plugin-types' => [],
+        'script-src' => [
+            'allow' => [],
+            'hashes' => [],
+            'self' => true,
+            'unsafe-inline' => false,
+            'unsafe-eval' => false,
+        ],
+        'style-src' => [
+            'self' => true,
+        ],
+        'upgrade-insecure-requests' => true,
+        'worker-src' => [
+            'allow' => [],
+            'self' => false,
+        ],
+    ];
 
-    /*
-     * @var array
-     */
-    private $nonces;
+    private array $options;
+
+    private CSPBuilder $cspBuilder;
+
+    private array $nonces = [];
 
     public function __construct(array $options = [])
     {
-        $isPanel = strpos(
-            kirby()->request()->url()->toString(),
-            kirby()->urls()->panel()
-        ) !== false;
-        $isApi = strpos(
-            kirby()->request()->url()->toString(),
-            kirby()->urls()->api()
-        ) !== false;
-        $panelHasNonces =  method_exists(kirby(), 'nonce');
+        $url = kirby()->request()->url()->toString();
+        $isPanel = str_contains($url, kirby()->urls()->panel());
+        $isApi = str_contains($url, kirby()->urls()->api());
+        $enabled = ! kirby()->system()->isLocal() && ! $isPanel && ! $isApi;
 
-        $enabled = !kirby()->system()->isLocal();
-        if ($isPanel || $isApi) {
-            $enabled = false;
-        }
-
-        $defaults = [
+        $this->options = array_merge([
             'debug' => option('debug'),
             'enabled' => option('bnomei.securityheaders.enabled', $enabled),
-            'headers' => option('bnomei.securityheaders.headers'),
-            'seed' => option('bnomei.securityheaders.seed'),
             'panel' => $isPanel,
-            'panelnonces' => $panelHasNonces ? ['panel' => kirby()->nonce()] : [],
+            'panelnonces' => ['panel' => kirby()->nonce()],
+            'seed' => option('bnomei.securityheaders.seed'),
+            'headers' => option('bnomei.securityheaders.headers'),
             'loader' => option('bnomei.securityheaders.loader'),
             'setter' => option('bnomei.securityheaders.setter'),
-        ];
-        $this->options = array_merge($defaults, $options);
-        $this->nonces = [];
+        ], $options);
 
         foreach ($this->options as $key => $call) {
-            if (is_callable($call) && in_array($key, ['loader', 'enabled', 'headers', 'seed'])) {
+            if ($call instanceof Closure && in_array($key, ['loader', 'enabled', 'headers', 'seed'])) {
                 $this->options[$key] = $call();
             }
         }
+
+        $this->load();
+        $this->applySetter();
     }
 
-    /**
-     * @return array|misc
-     */
-    public function option(?string $key = null)
+    public function option(?string $key = null): mixed
     {
         if ($key) {
             return A::get($this->options, $key);
         }
+
         return $this->options;
     }
 
-    /**
-     * @return string|null
-     */
     public function getNonce(string $key): ?string
     {
         return A::get($this->nonces, $key);
     }
 
-    /**
-     * @param string
-     */
     public function setNonce(string $key): string
     {
-        $nonceArr = [$key, time(), filemtime(__FILE__), kirby()->roots()->assets()];
+        $nonceArr = [$key, time(), filemtime(__FILE__), (string) kirby()->roots()->index()];
         shuffle($nonceArr);
         $nonce = base64_encode(sha1(implode('', $nonceArr)));
 
         $this->nonces[$key] = $nonce;
+
         return $nonce;
     }
 
-    /**
-     * @return mixed
-     */
-    public function csp()
+    public function csp(): CSPBuilder
     {
         return $this->cspBuilder;
     }
 
-    /**
-     * @param null $data
-     * @return CSPBuilder
-     */
-    public function load($data = null): CSPBuilder
+    public function load(array|string|null $data = null): CSPBuilder
     {
         if (is_null($data)) {
             $data = $this->option('loader');
@@ -125,23 +182,27 @@ final class SecurityHeaders
                 $data = Yaml::decode($data);
             }
         }
+
         if (is_array($data)) {
             $this->cspBuilder = CSPBuilder::fromArray($data);
-        } else {
-            $this->cspBuilder = new CSPBuilder();
+        } else { // aka null
+            $this->cspBuilder = new CSPBuilder;
         }
 
         // add nonce for self
-        if ($self = $this->option('seed')) {
-            $nonce = $this->setNonce((string) $self);
+        if ($seed = strval($this->option('seed'))) {
+            $nonce = $this->setNonce($seed);
             $this->cspBuilder->nonce('script-src', $nonce);
             $this->cspBuilder->nonce('style-src', $nonce);
         }
 
         // add panel nonces
         if ($this->option('panel')) {
-            $panelnonces = $this->option('panelnonces');
+            $panelnonces = (array) $this->option('panelnonces');
             foreach ($panelnonces as $nonce) {
+                if (! is_string($nonce)) {
+                    continue;
+                }
                 $this->cspBuilder->nonce('img-src', $nonce);
                 $this->cspBuilder->nonce('script-src', $nonce);
                 $this->cspBuilder->nonce('style-src', $nonce);
@@ -151,84 +212,53 @@ final class SecurityHeaders
         return $this->cspBuilder;
     }
 
-    /**
-     *
-     */
-    public function applySetter()
+    public function applySetter(): void
     {
-        // additional setters
         $csp = $this->option('setter');
-        if (is_callable($csp)) {
+        if ($csp instanceof Closure) {
             $csp($this);
         }
     }
 
-    /**
-     * @return bool
-     */
     public function sendHeaders(): bool
     {
         if ($this->option('enabled') === false) {
             return false;
         }
 
-        if ($this->option('debug') && $this->option('enabled') !== 'force') {
-            return false;
-        }
-
         // from config
-        $headers = $this->option('headers');
+        $headers = (array) $this->option('headers');
         foreach ($headers as $key => $value) {
             $value = is_array($value) ? implode('; ', $value) : $value;
-            header($key . ': ' . $value);
+            header(strval($key).': '.strval($value));
         }
 
-        // from cspbuilder
-        if ($this->cspBuilder) {
-            $this->cspBuilder->sendCSPHeader();
-        }
-        return true;
+        return $this->cspBuilder->sendCSPHeader();
     }
 
-    /**
-     * @param string $filepath
-     * @return bool
-     */
     public function saveApache(string $filepath): bool
     {
         $this->cspBuilder->saveSnippet($filepath, CSPBuilder::FORMAT_APACHE);
+
         return F::exists($filepath);
     }
 
-    /**
-     * @param string $filepath
-     * @return bool
-     */
     public function saveNginx(string $filepath): bool
     {
         $this->cspBuilder->saveSnippet($filepath, CSPBuilder::FORMAT_NGINX);
+
         return F::exists($filepath);
     }
 
-    /*
-     * @var SecurityHeaders
-     */
-    private static $singleton;
+    private static ?SecurityHeaders $singleton = null;
 
-    /**
-     * @param array $options
-     * @return SecurityHeaders
-     * @codeCoverageIgnore
-     */
     public static function singleton(array $options = []): SecurityHeaders
     {
-        if (self::$singleton) {
+        if (self::$singleton !== null) {
             return self::$singleton;
         }
 
         $sec = new SecurityHeaders($options);
-        $sec->load();
-        $sec->applySetter();
         self::$singleton = $sec;
 
         return self::$singleton;

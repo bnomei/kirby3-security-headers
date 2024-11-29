@@ -1,171 +1,144 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 use Bnomei\SecurityHeaders;
 use Kirby\Data\Json;
 use Kirby\Data\Yaml;
-use Kirby\Toolkit\F;
+use Kirby\Filesystem\F;
 use ParagonIE\CSPBuilder\CSPBuilder;
-use PHPUnit\Framework\TestCase;
 
-final class SecurityheadersTest extends TestCase
+class TestHelper
 {
-    private $jsonPath;
-    private $yamlPath;
-    private $apachePath;
-    private $nginxPath;
+    public const PATHS = [
+        'json' => __DIR__.'/fixtures/securityheaders.json',
+        'yaml' => __DIR__.'/fixtures/securityheaders.yml',
+        'apache' => __DIR__.'/fixtures/.htaccess',
+        'nginx' => __DIR__.'/fixtures/nginx.conf',
+    ];
 
-    public function setUp(): void
+    public function __construct(
+        public string $json,
+        public string $yaml,
+        public string $apache,
+        public string $nginx,
+    ) {}
+
+    public function before(): void
     {
-        $this->jsonPath = __DIR__ . '/test-builder-config.json';
-        $this->yamlPath = __DIR__ . '/test-builder-config.yml';
-        $this->apachePath = __DIR__ . '/apache.cache';
-        $this->nginxPath = __DIR__ . '/nginx.cache';
+        F::remove($this->apache);
+        F::remove($this->nginx);
 
-        if (F::exists($this->jsonPath) && !F::exists($this->yamlPath)) {
-            $json = Json::decode(F::read($this->jsonPath));
-            F::write($this->yamlPath, Yaml::encode($json));
+        if (F::exists($this->json) && ! F::exists($this->yaml)) {
+            $json = Json::decode(F::read($this->json));
+            F::write($this->yaml, Yaml::encode($json));
         }
-
-        F::remove($this->apachePath);
-        F::remove($this->nginxPath);
     }
 
-    public function tearDown(): void
+    public function after(): void
     {
-        F::remove($this->apachePath);
-        F::remove($this->nginxPath);
+        F::remove($this->apache);
+        F::remove($this->nginx);
     }
 
-    public function testConstruct()
+    public static function make(array $args = []): self
     {
-        $sec = new Bnomei\SecurityHeaders();
-        $this->assertInstanceOf(SecurityHeaders::class, $sec);
-    }
-
-    public function testOptions()
-    {
-        $sec = new Bnomei\SecurityHeaders();
-        $this->assertIsArray($sec->option());
-        $this->assertCount(8, $sec->option());
-
-        $this->assertTrue($sec->option('debug')); // config "force"
-
-        $sec = new Bnomei\SecurityHeaders([
-            'debug' => true,
-            'enabled' => function () {
-                return false;
-            }
-        ]);
-        $this->assertTrue($sec->option('debug'));
-        $this->assertFalse($sec->option('enabled'));
-    }
-
-    public function testCsp()
-    {
-        $sec = new Bnomei\SecurityHeaders();
-        $this->assertNull($sec->csp());
-
-        $builder = $sec->load();
-        $this->assertInstanceOf(CSPBuilder::class, $builder);
-        $this->assertEquals($builder, $sec->csp());
-    }
-
-    public function testLoad()
-    {
-        $sec = new Bnomei\SecurityHeaders();
-        $builder = $sec->load([]);
-        $this->assertInstanceOf(CSPBuilder::class, $builder);
-
-        $builder = $sec->load($this->jsonPath);
-        $this->assertInstanceOf(CSPBuilder::class, $builder);
-
-        $builder = $sec->load($this->yamlPath);
-        $this->assertInstanceOf(CSPBuilder::class, $builder);
-
-        $builder = $sec->load(Json::decode(F::read($this->jsonPath)));
-        $this->assertInstanceOf(CSPBuilder::class, $builder);
-    }
-
-    public function testApplySetter()
-    {
-        $sec = new Bnomei\SecurityHeaders([
-            'setter' => function (SecurityHeaders $instance) {
-                $instance->saveApache($this->apachePath);
-            },
-        ]);
-        $sec->load();
-        $sec->applySetter();
-        $this->assertTrue(F::exists($this->apachePath));
-    }
-
-    public function testSave()
-    {
-        $sec = SecurityHeaders::singleton();
-        $this->assertTrue($sec->saveApache($this->apachePath));
-        $this->assertTrue($sec->saveNginx($this->nginxPath));
-    }
-
-    public function testSingleton()
-    {
-        $sec = SecurityHeaders::singleton();
-        $this->assertInstanceOf(SecurityHeaders::class, $sec);
-    }
-
-    public function testSendHeadersDisabled()
-    {
-        $sec = new Bnomei\SecurityHeaders([
-            'enabled' => false, // force against localhost check
-        ]);
-        $sec->load();
-        $this->assertFalse($sec->sendHeaders());
-    }
-
-    public function testForceEnabled()
-    {
-        $sec = new Bnomei\SecurityHeaders([
-            'debug' => true,
-            'enabled' => 'force',
-            'headers' => [], // no default headers to test covage from sendCSPHeader
-        ]);
-        $sec->load();
-        $this->expectExceptionMessageMatches(
-            '/^Headers already sent!*$/'
-        );
-        $this->assertFalse($sec->sendHeaders());
-    }
-
-    public function testSendHeadersCSPOnly()
-    {
-        $sec = new Bnomei\SecurityHeaders([
-            'enabled' => 'force', // force against localhost check
-            'headers' => [], // no default headers to test covage from sendCSPHeader
-        ]);
-        $sec->load();
-        $this->expectExceptionMessageMatches(
-            '/^Headers already sent!*$/'
-        );
-        $this->assertFalse($sec->sendHeaders());
-    }
-
-    public function testSendHeadersFull()
-    {
-        $sec = new Bnomei\SecurityHeaders([
-            'enabled' => 'force', // force against localhost check
-        ]);
-        $sec->load();
-        $this->expectExceptionMessageMatches(
-            '/^Cannot modify header information - headers already sent by.*$/'
-        );
-        $this->assertTrue($sec->sendHeaders());
-    }
-
-    public function testNonces()
-    {
-        $sec = new Bnomei\SecurityHeaders();
-        $n = $sec->setNonce('test');
-        $this->assertMatchesRegularExpression('/^(.){54}==$/', $n);
-        $this->assertEquals($n, $sec->getNonce('test'));
+        return new self(...(count($args) === 0 ? static::PATHS : $args));
     }
 }
+
+beforeEach(function () {
+    TestHelper::make()->before();
+});
+
+afterEach(function () {
+    TestHelper::make()->after();
+});
+
+test('construct', function () {
+    $sec = new Bnomei\SecurityHeaders;
+    expect($sec)->toBeInstanceOf(SecurityHeaders::class);
+});
+
+test('options', function () {
+    $sec = new Bnomei\SecurityHeaders;
+    expect($sec->option())->toBeArray();
+    expect($sec->option())->toHaveCount(8);
+
+    expect($sec->option('debug'))->toBeTrue();
+
+    // config "force"
+    $sec = new Bnomei\SecurityHeaders([
+        'debug' => true,
+        'enabled' => function () {
+            return false;
+        },
+    ]);
+    expect($sec->option('debug'))->toBeTrue();
+    expect($sec->option('enabled'))->toBeFalse();
+});
+
+test('csp', function () {
+    $sec = new Bnomei\SecurityHeaders;
+    $builder = $sec->csp();
+    expect($builder)->toBeInstanceOf(CSPBuilder::class);
+    expect($sec->csp())->toEqual($builder);
+});
+
+test('load', function () {
+    $sec = new Bnomei\SecurityHeaders;
+    $builder = $sec->load([]);
+    expect($builder)->toBeInstanceOf(CSPBuilder::class);
+
+    $builder = $sec->load(TestHelper::PATHS['json']);
+    expect($builder)->toBeInstanceOf(CSPBuilder::class);
+
+    $builder = $sec->load(TestHelper::PATHS['yaml']);
+    expect($builder)->toBeInstanceOf(CSPBuilder::class);
+
+    $builder = $sec->load(Json::decode(F::read(TestHelper::PATHS['json'])));
+    expect($builder)->toBeInstanceOf(CSPBuilder::class);
+});
+
+test('apply setter', function () {
+    $sec = new Bnomei\SecurityHeaders([
+        'setter' => function (SecurityHeaders $instance) {
+            $instance->saveApache(TestHelper::PATHS['apache']);
+        },
+    ]);
+    $sec->load();
+    $sec->applySetter();
+    expect(F::exists(TestHelper::PATHS['apache']))->toBeTrue();
+});
+
+test('save', function () {
+    $sec = SecurityHeaders::singleton();
+    expect($sec->saveApache(TestHelper::PATHS['apache']))->toBeTrue()
+        ->and($sec->saveNginx(TestHelper::PATHS['nginx']))->toBeTrue();
+});
+
+test('singleton', function () {
+    $sec = SecurityHeaders::singleton();
+    expect($sec)->toBeInstanceOf(SecurityHeaders::class);
+});
+
+test('send headers disabled', function () {
+    $sec = new Bnomei\SecurityHeaders([
+        'enabled' => false, // force against localhost check
+    ]);
+    expect($sec->sendHeaders())->toBeFalse();
+});
+
+test('send headers full', function () {
+    $sec = new Bnomei\SecurityHeaders([
+        'enabled' => true, // force against localhost check
+    ]);
+    expect($sec->sendHeaders())->toBeTrue();
+});
+
+test('nonces', function () {
+    $sec = new Bnomei\SecurityHeaders;
+    $n = $sec->setNonce('test');
+    expect($n)->toMatch('/^(.){54}==$/')
+        ->and($sec->getNonce('test'))->toEqual($n);
+});

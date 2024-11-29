@@ -1,54 +1,18 @@
 <?php
 
-use Bnomei\SecurityHeaders;
+use Kirby\Http\Url;
 
-@include_once __DIR__ . '/vendor/autoload.php';
+@include_once __DIR__.'/vendor/autoload.php';
 
 Kirby::plugin('bnomei/securityheaders', [
     'options' => [
-        'enabled' => null, // null => disable in panel and api
+        'enabled' => null, // null => auto-detection: disable in debug-mode, panel and api
         'seed' => function () {
             return Url::stripPath(site()->url());
         },
-        'headers' => [
-            "X-Powered-By" => "", // unset
-            "X-Frame-Options" => "DENY",
-            "X-XSS-Protection" => "1; mode=block",
-            "X-Content-Type-Options" => "nosniff",
-            "strict-transport-security" => "max-age=31536000; includeSubdomains; preload",
-            "Referrer-Policy" => "no-referrer-when-downgrade",
-            "Permissions-Policy" => 'interest-cohort=()', // flock-off
-            // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Feature-Policy
-            "Feature-Policy" => [
-                "accelerometer 'none'",
-                "ambient-light-sensor 'none'",
-                "autoplay 'none'",
-                "battery 'none'",
-                "camera 'none'",
-                "display-capture 'none'",
-                "document-domain 'none'",
-                "encrypted-media 'none'",
-                "execution-while-not-rendered 'none'",
-                "execution-while-out-of-viewport 'none'",
-                "fullscreen 'none'",
-                "geolocation 'none'",
-                "gyroscope 'none'",
-                "layout-animations 'none'",
-                "legacy-image-formats 'none'",
-                "magnetometer 'none'",
-                "microphone 'none'",
-                "midi 'none'",
-                "navigation-override 'none'",
-                "oversized-images 'none'",
-                "payment 'none'",
-                "picture-in-picture 'none'",
-                "publickey-credentials 'none'",
-                "sync-xhr 'none'",
-                "usb 'none'",
-                "wake-lock 'none'",
-                "xr-spatial-tracking 'none'",
-            ],
-        ],
+        'headers' => function () {
+            return \Bnomei\SecurityHeaders::HEADERS_DEFAULT;
+        },
         'loader' => function () {
             // https://github.com/paragonie/csp-builder#example
             // null if you do NOT want to use default and/or just the setter
@@ -62,10 +26,10 @@ Kirby::plugin('bnomei/securityheaders', [
                 return kirby()->roots()->site() . '/your-csp.json';
                 return kirby()->roots()->site() . '/your-csp.yml';
             */
-            // otherwise forward the default file from this plugin
-            return __DIR__ . '/loader.json';
+
+            return \Bnomei\SecurityHeaders::LOADER_DEFAULT;
         },
-        'setter' => function (SecurityHeaders $instance): void {
+        'setter' => function (\Bnomei\SecurityHeaders $instance): void {
             // https://github.com/paragonie/csp-builder#build-a-content-security-policy-programmatically
             /*
                 $csp = $instance->csp();
@@ -83,18 +47,18 @@ Kirby::plugin('bnomei/securityheaders', [
     ],
     'hooks' => [
         'route:before' => function (): void {
-            SecurityHeaders::singleton()->sendHeaders();
+            \Bnomei\SecurityHeaders::singleton()->sendHeaders();
         },
     ],
     'pageMethods' => [
         'nonce' => function (string $key): ?string {
-            return SecurityHeaders::singleton()->getNonce($key);
+            return \Bnomei\SecurityHeaders::singleton()->getNonce($key);
         },
         'nonceAttr' => function (string $key): string {
             return implode(
                 [
                     'nonce="',
-                    SecurityHeaders::singleton()->getNonce($key),
+                    \Bnomei\SecurityHeaders::singleton()->getNonce($key),
                     '"',
                 ]
             );
@@ -102,13 +66,13 @@ Kirby::plugin('bnomei/securityheaders', [
     ],
     'siteMethods' => [
         'nonce' => function (): ?string {
-            return SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url()));
+            return \Bnomei\SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url()));
         },
         'nonceAttr' => function (): string {
             return implode(
                 [
                     'nonce="',
-                    SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url())),
+                    \Bnomei\SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url())),
                     '"',
                 ]
             );
