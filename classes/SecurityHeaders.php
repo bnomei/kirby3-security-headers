@@ -169,35 +169,53 @@ class SecurityHeaders
 
     public function load(array|string|null $data = null): CSPBuilder
     {
+        // load default if is null
         if (is_null($data)) {
             $data = $this->option('loader');
         }
 
-        if (is_string($data) && F::exists($data)) {
-            $mime = F::mime($data);
-            $data = F::read($data);
-            if (in_array($mime, A::get(Mime::types(), 'json'))) {
-                $data = Json::decode($data);
-            } elseif (A::get(Mime::types(), 'yaml') && in_array($mime, A::get(Mime::types(), 'yaml'))) {
-                $data = Yaml::decode($data);
-            }
+        if (is_string($data)) {
+            $data = $this->loadFromFile($data);
         }
 
-        if (is_array($data)) {
-            $this->cspBuilder = CSPBuilder::fromArray($data);
-        } else { // aka null
-            $this->cspBuilder = new CSPBuilder;
+        $this->cspBuilder = is_array($data) ? CSPBuilder::fromArray($data) : new CSPBuilder;
+
+        $this->addNonceForSelf();
+        $this->addPanelNonces();
+
+        return $this->cspBuilder;
+    }
+
+    public function loadFromFile(string $data): mixed
+    {
+        if (! F::exists($data)) {
+            return null;
         }
 
-        // add nonce for self
+        $mime = F::mime($data);
+        $data = F::read($data);
+
+        if (in_array($mime, A::get(Mime::types(), 'json'))) {
+            $data = Json::decode($data);
+        } elseif (A::get(Mime::types(), 'yaml') && in_array($mime, A::get(Mime::types(), 'yaml'))) {
+            $data = Yaml::decode($data);
+        }
+
+        return $data;
+    }
+
+    public function addNonceForSelf(): void
+    {
         if ($seed = strval($this->option('seed'))) {
             $nonce = $this->setNonce($seed);
             $this->cspBuilder->nonce('script-src', $nonce);
             $this->cspBuilder->nonce('style-src', $nonce);
         }
+    }
 
-        // add panel nonces
-        if ($this->option('panel')) {
+    public function addPanelNonces(): void
+    {
+        if (! $this->option('panel')) {
             $panelnonces = (array) $this->option('panelnonces');
             foreach ($panelnonces as $nonce) {
                 if (! is_string($nonce)) {
@@ -208,8 +226,6 @@ class SecurityHeaders
                 $this->cspBuilder->nonce('style-src', $nonce);
             }
         }
-
-        return $this->cspBuilder;
     }
 
     public function applySetter(): void
