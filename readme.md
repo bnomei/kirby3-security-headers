@@ -91,20 +91,20 @@ return [
         // $csp->setAllowUnsafeInline('style-src', true);
         
         // youtube
-        $csp->addSource('image', 'https://ytimg.com');
-        $csp->addSource('image', 'https://ggpht.com');
-        $csp->addSource('frame', 'https://youtube.com');
         $csp->addSource('frame', 'https://www.youtube.com');
+        $csp->addSource('frame', 'https://youtube.com');
+        $csp->addSource('image', 'https://ggpht.com');
         $csp->addSource('image', 'https://youtube.com');
-        $csp->addSource('script', 'https://youtube.com');
+        $csp->addSource('image', 'https://ytimg.com');
         $csp->addSource('script', 'https://google.com');
+        $csp->addSource('script', 'https://youtube.com');
 
         // vimeo
+        $csp->addSource('frame', 'player.vimeo.com');
         $csp->addSource('image', 'i.vimeocdn.com');
         $csp->addSource('script', 'f.vimeocdn.com');
-        $csp->addSource('style', 'f.vimeocdn.com');
-        $csp->addSource('frame', 'player.vimeo.com');
         $csp->addSource('source', 'player.vimeo.com');
+        $csp->addSource('style', 'f.vimeocdn.com');
     },
     // other options...
 ];
