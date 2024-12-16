@@ -50,7 +50,7 @@ automatically. But you will most likely need to customize the CSP headers when u
 - when using inline `<script>` and/or `<style>`.
 
 > [!TIP]
-> The plugin will automatically disable itself on local setups to not get in your way while developing. To test the CSP headers locally, you can use the `'bnomei.securityheaders.enable' => true,` option to enforce sending the headers.
+> The plugin will automatically disable itself on local setups to not get in your way while developing. To test the CSP headers locally, you can use the `'bnomei.securityheaders.enabled' => true,` option to enforce sending the headers.
 
 ## Customizing CSP Headers & Nonces
 
