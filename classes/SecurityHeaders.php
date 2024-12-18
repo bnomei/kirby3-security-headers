@@ -125,6 +125,7 @@ class SecurityHeaders
             'headers' => option('bnomei.securityheaders.headers'),
             'loader' => option('bnomei.securityheaders.loader'),
             'setter' => option('bnomei.securityheaders.setter'),
+            'legacy' => option('bnomei.securityheaders.legacy'),
         ], $options);
 
         foreach ($this->options as $key => $call) {
@@ -249,8 +250,8 @@ class SecurityHeaders
             header(strval($key).': '.strval($value));
         }
 
-        return $this->cspBuilder->sendCSPHeader();
-    }
+        return $this->cspBuilder->sendCSPHeader($this->option('legacy'));
+	}
 
     public function saveApache(string $filepath): bool
     {
