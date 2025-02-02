@@ -220,6 +220,11 @@ class SecurityHeaders
 
     public function addPanelNonces(): void
     {
+        $seed = $this->option('seed');
+        if (! $seed || ! is_string($seed)) {
+            return;
+        }
+
         if (! $this->option('panel')) {
             $panelnonces = (array) $this->option('panelnonces');
             foreach ($panelnonces as $nonce) {
