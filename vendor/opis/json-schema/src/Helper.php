@@ -235,40 +235,81 @@ final class Helper
         return false;
     }
 
+
+    /**
+     * @var bool|null True if bcmath extension is available
+     */
+    private static ?bool $hasBCMath = null;
+
+    /**
+     * @var bool True to use bcmath
+     */
+    public static bool $useBCMath = true;
+
+    /**
+     * @var int Number scale to used when using comparisons
+     */
+    public static int $numberScale = 14;
+
     /**
      * @param $number
      * @param $divisor
-     * @param int $scale
+     * @param int|null $scale
      * @return bool
      */
-    public static function isMultipleOf($number, $divisor, int $scale = 14): bool
+    public static function isMultipleOf($number, $divisor, ?int $scale = null): bool
     {
-        static $bcMath = null;
-        if ($bcMath === null) {
-            $bcMath = extension_loaded('bcmath');
+        if (!$number || $number == $divisor) {
+            return true;
         }
+
         if ($divisor == 0) {
             return $number == 0;
         }
 
-        if ($bcMath) {
-            $number = number_format($number, $scale, '.', '');
-            $divisor = number_format($divisor, $scale, '.', '');
-
-            /** @noinspection PhpComposerExtensionStubsInspection */
-            $x = bcdiv($number, $divisor, 0);
-            /** @noinspection PhpComposerExtensionStubsInspection */
-            $x = bcmul($divisor, $x, $scale);
-            /** @noinspection PhpComposerExtensionStubsInspection */
-            $x = bcsub($number, $x, $scale);
-
-            /** @noinspection PhpComposerExtensionStubsInspection */
-            return 0 === bccomp($x, 0, $scale);
+        // maybe we get lucky
+        if (!fmod($number, $divisor)) {
+            return true;
         }
 
-        $div = $number / $divisor;
+        $divisor = abs($divisor);
+        if ($divisor == 1) {
+            // should have been caught by the above fmod()
+            return false;
+        }
 
-        return $div == (int)$div;
+        $number = abs($number);
+        if ($divisor > $number) {
+            // number / divisor < 1
+            return false;
+        }
+
+        // Use global scale if null
+        $scale ??= self::$numberScale;
+
+        if (
+            !self::$useBCMath ||
+            !(self::$hasBCMath ??= extension_loaded('bcmath'))
+        ) {
+            // use an approximation
+            return abs($number - round($number / $divisor) * $divisor) < (10 ** -$scale);
+        }
+
+        // use bcmath
+
+        $number = number_format($number, $scale, '.', '');
+        $divisor = number_format($divisor, $scale, '.', '');
+
+        // number can be zero after formatting
+        if (!(float)$divisor) {
+            return $number === $divisor;
+        }
+
+        $x = bcdiv($number, $divisor, 0);
+        $x = bcmul($divisor, $x, $scale);
+        $x = bcsub($number, $x, $scale);
+
+        return 0 === bccomp($x, 0, $scale);
     }
 
     /**
