@@ -206,7 +206,12 @@ class SecurityHeaders
 
     public function addNonceForSelf(): void
     {
-        if ($seed = strval($this->option('seed'))) {
+        $seed = $this->option('seed');
+        if (! $seed || ! is_string($seed)) {
+            return;
+        }
+        $seed = trim($seed);
+        if (! empty($seed)) {
             $nonce = $this->setNonce($seed);
             $this->cspBuilder->nonce('script-src', $nonce);
             $this->cspBuilder->nonce('style-src', $nonce);
