@@ -63,7 +63,7 @@ test('construct', function () {
 test('options', function () {
     $sec = new Bnomei\SecurityHeaders;
     expect($sec->option())->toBeArray();
-    expect($sec->option())->toHaveCount(8);
+    expect($sec->option())->toHaveCount(9);
 
     expect($sec->option('debug'))->toBeTrue();
 

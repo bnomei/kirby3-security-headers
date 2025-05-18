@@ -156,7 +156,7 @@ It is also recommended that you use Content-Security-Policy instead of XSS filte
 | bnomei.securityheaders. | Default           | Description                                                     |            
 |-------------------------|-------------------|-----------------------------------------------------------------|
 | enabled                 | `null/true/false` | will set headers                                                |
-| legacy                  | `true`            | disables setting deprecated legacy headers (see Legacy headers) |
+| legacy                  | `false`           | disables setting deprecated legacy headers (see Legacy headers) |
 | seed                    | `callback`        | returns a unique seed for frontend nonces on every request      |
 | headers                 | `callback`        | array of sensible default values                                |
 | loader                  | `callback`        | returning filepath or array                                     |

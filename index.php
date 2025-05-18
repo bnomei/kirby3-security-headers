@@ -7,7 +7,7 @@ use Kirby\Http\Url;
 Kirby::plugin('bnomei/securityheaders', [
     'options' => [
         'enabled' => null, // null => auto-detection: disable in debug-mode, panel and api
-        'legacy' => true, // false -> disable deprecated legacy header generation
+        'legacy' => false, // true -> disable deprecated legacy header generation
         'seed' => function () {
             return Url::stripPath(site()->url());
         },
