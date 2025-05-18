@@ -260,7 +260,7 @@ class SecurityHeaders
             header(strval($key).': '.strval($value));
         }
 
-        return $this->cspBuilder->sendCSPHeader($this->option('legacy'));
+        return $this->cspBuilder->sendCSPHeader(boolval($this->option('legacy')));
     }
 
     public function saveApache(string $filepath): bool
