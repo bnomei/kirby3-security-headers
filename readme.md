@@ -142,15 +142,25 @@ disabled if one the following conditions apply:
 > [!WARNING]
 > By default, CSP headers are never sent for any Kirby Panel, API and Media routes.
 
+## Legacy headers
+
+It is known that having both Content-Security-Policy and X-Content-Security-Policy or X-Webkit-CSP causes unexpected behaviors on certain versions of browsers. Please avoid using deprecated X-* headers [[1]](https://content-security-policy.com/).
+[[2]](https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html#warning)
+
+It is also recommended that you use Content-Security-Policy instead of XSS filtering.
+[[3]](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection)
+[[4]](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Headers_Cheat_Sheet.html#x-xss-protection)
+
 ## Settings
 
-| bnomei.securityheaders. | Default           | Description                                               |            
-|-------------------------|-------------------|-----------------------------------------------------------|
-| enabled                 | `null/true/false` | will set headers                                          |
-| seed                    | `callback`        | returns a unique seed for frontend nonces on every request |
-| headers                 | `callback`        | array of sensible default values                          |
-| loader                  | `callback`        | returning filepath or array                               |
-| setter                  | `callback`        | instance which allows customizing the CSPBuilder          |
+| bnomei.securityheaders. | Default           | Description                                                     |            
+|-------------------------|-------------------|-----------------------------------------------------------------|
+| enabled                 | `null/true/false` | will set headers                                                |
+| legacy                  | `true`            | disables setting deprecated legacy headers (see Legacy headers) |
+| seed                    | `callback`        | returns a unique seed for frontend nonces on every request      |
+| headers                 | `callback`        | array of sensible default values                                |
+| loader                  | `callback`        | returning filepath or array                                     |
+| setter                  | `callback`        | instance which allows customizing the CSPBuilder                |
 
 ## Dependencies
 
