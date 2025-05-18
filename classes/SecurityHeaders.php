@@ -261,7 +261,7 @@ class SecurityHeaders
         }
 
         return $this->cspBuilder->sendCSPHeader($this->option('legacy'));
-	}
+    }
 
     public function saveApache(string $filepath): bool
     {
