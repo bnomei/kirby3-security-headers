@@ -1,5 +1,6 @@
 <?php
 
+use Bnomei\SecurityHeaders;
 use Kirby\Http\Url;
 
 @include_once __DIR__.'/vendor/autoload.php';
@@ -12,7 +13,7 @@ Kirby::plugin('bnomei/securityheaders', [
             return Url::stripPath(site()->url());
         },
         'headers' => function () {
-            return \Bnomei\SecurityHeaders::HEADERS_DEFAULT;
+            return SecurityHeaders::HEADERS_DEFAULT;
         },
         'loader' => function () {
             // https://github.com/paragonie/csp-builder#example
@@ -28,9 +29,9 @@ Kirby::plugin('bnomei/securityheaders', [
                 return kirby()->roots()->site() . '/your-csp.yml';
             */
 
-            return \Bnomei\SecurityHeaders::LOADER_DEFAULT;
+            return SecurityHeaders::LOADER_DEFAULT;
         },
-        'setter' => function (\Bnomei\SecurityHeaders $instance): void {
+        'setter' => function (SecurityHeaders $instance): void {
             // https://github.com/paragonie/csp-builder#build-a-content-security-policy-programmatically
             /*
                 $csp = $instance->csp();
@@ -48,18 +49,18 @@ Kirby::plugin('bnomei/securityheaders', [
     ],
     'hooks' => [
         'route:before' => function (): void {
-            \Bnomei\SecurityHeaders::singleton()->sendHeaders();
+            SecurityHeaders::singleton()->sendHeaders();
         },
     ],
     'pageMethods' => [
         'nonce' => function (string $key): ?string {
-            return \Bnomei\SecurityHeaders::singleton()->getNonce($key);
+            return SecurityHeaders::singleton()->getNonce($key);
         },
         'nonceAttr' => function (string $key): string {
             return implode(
                 [
                     'nonce="',
-                    \Bnomei\SecurityHeaders::singleton()->getNonce($key),
+                    htmlspecialchars((string) SecurityHeaders::singleton()->getNonce($key), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
                     '"',
                 ]
             );
@@ -67,13 +68,13 @@ Kirby::plugin('bnomei/securityheaders', [
     ],
     'siteMethods' => [
         'nonce' => function (): ?string {
-            return \Bnomei\SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url()));
+            return SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url()));
         },
         'nonceAttr' => function (): string {
             return implode(
                 [
                     'nonce="',
-                    \Bnomei\SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url())),
+                    htmlspecialchars((string) SecurityHeaders::singleton()->getNonce(Url::stripPath(site()->url())), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
                     '"',
                 ]
             );

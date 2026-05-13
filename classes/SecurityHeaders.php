@@ -111,10 +111,11 @@ class SecurityHeaders
 
     public function __construct(array $options = [])
     {
-        $url = kirby()->request()->url()->toString();
-        $isPanel = str_contains($url, kirby()->urls()->panel());
-        $isApi = str_contains($url, kirby()->urls()->api());
-        $enabled = ! kirby()->system()->isLocal() && ! $isPanel && ! $isApi;
+        $path = trim(kirby()->path(), '/');
+        $isPanel = $this->matchesRoutePath($path, option('panel.slug', 'panel'));
+        $isApi = $this->matchesRoutePath($path, option('api.slug', 'api'));
+        $isMedia = $this->matchesRoutePath($path, $this->mediaRoutePath());
+        $enabled = ! kirby()->system()->isLocal() && ! $isPanel && ! $isApi && ! $isMedia;
 
         $this->options = array_merge([
             'debug' => option('debug'),
@@ -154,9 +155,7 @@ class SecurityHeaders
 
     public function setNonce(string $key): string
     {
-        $nonceArr = [$key, time(), filemtime(__FILE__), (string) kirby()->roots()->index()];
-        shuffle($nonceArr);
-        $nonce = base64_encode(sha1(implode('', $nonceArr)));
+        $nonce = base64_encode(random_bytes(18));
 
         $this->nonces[$key] = $nonce;
 
@@ -256,8 +255,7 @@ class SecurityHeaders
         // from config
         $headers = (array) $this->option('headers');
         foreach ($headers as $key => $value) {
-            $value = is_array($value) ? implode('; ', $value) : $value;
-            header(strval($key).': '.strval($value));
+            header(strval($key).': '.$this->headerValue($value));
         }
 
         return $this->cspBuilder->sendCSPHeader(boolval($this->option('legacy')));
@@ -289,5 +287,51 @@ class SecurityHeaders
         self::$singleton = $sec;
 
         return self::$singleton;
+    }
+
+    private function matchesRoutePath(string $path, mixed $route): bool
+    {
+        if (! is_string($route)) {
+            return false;
+        }
+
+        $route = trim($route, '/');
+        if ($route === '') {
+            return false;
+        }
+
+        return $path === $route || str_starts_with($path, $route.'/');
+    }
+
+    private function headerValue(mixed $value): string
+    {
+        if (is_array($value)) {
+            return implode('; ', array_map(fn (mixed $value): string => $this->headerValue($value), $value));
+        }
+
+        if ($value instanceof \Stringable || is_scalar($value) || $value === null) {
+            return strval($value);
+        }
+
+        return '';
+    }
+
+    private function mediaRoutePath(): string
+    {
+        $indexUrl = kirby()->url('index');
+        $mediaUrl = kirby()->url('media');
+
+        if (! is_string($indexUrl) || ! is_string($mediaUrl)) {
+            return 'media';
+        }
+
+        $index = rtrim($indexUrl, '/');
+        $media = rtrim($mediaUrl, '/');
+
+        if ($index !== '' && ($media === $index || str_starts_with($media, $index.'/'))) {
+            return trim(substr($media, strlen($index)), '/');
+        }
+
+        return 'media';
     }
 }
