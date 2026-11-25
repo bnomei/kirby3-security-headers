@@ -1,7 +1,7 @@
 {
   "name": "bnomei/kirby3-security-headers",
   "type": "kirby-plugin",
-  "version": "5.2.0",
+  "version": "6.0.0",
   "license": "MIT",
   "description": "Kirby Plugin for easier Security Headers setup",
   "authors": [
@@ -70,7 +70,10 @@
     ]
   },
   "extra": {
-    "kirby-cms-path": "tests/kirby"
+    "kirby-cms-path": "tests/kirby",
+    "kirby": {
+      "compatible": "^5.0 || ^6.0"
+    }
   },
   "suggest": {
     "bnomei/kirby3-doctor": "Add a panel button to check health and security of your Kirby installation"
